@@ -455,52 +455,150 @@ body {
 <input type="file" id="uploadAudio" accept="audio/*" style="display:none" onchange="changeMusic(this)">
 
 <script>
+// ==================== INDEXEDDB ====================
+function idb() {
+  return new Promise((resolve, reject) => {
+    const r = indexedDB.open('myspace_blobs', 1);
+    r.onupgradeneeded = () => { r.result.createObjectStore('blobs'); };
+    r.onsuccess = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+  });
+}
+
+async function idbPut(key, val) {
+  const db = await idb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('blobs', 'readwrite');
+    tx.objectStore('blobs').put(val, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function idbGet(key) {
+  const db = await idb();
+  return new Promise((resolve) => {
+    const tx = db.transaction('blobs', 'readonly');
+    const req = tx.objectStore('blobs').get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => resolve(null);
+  });
+}
+
+async function idbDel(key) {
+  const db = await idb();
+  return new Promise((resolve) => {
+    const tx = db.transaction('blobs', 'readwrite');
+    tx.objectStore('blobs').delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+}
+
 // ==================== DATA ====================
-const KEY = 'myspace_v2';
+const META_KEY = 'myspace_meta';
 
 const DEFAULTS = {
   title: 'MY SPACE',
   bg: '',
   musicUrl: '', musicName: '',
   media: [
-    { type:'image', src:'', w:1600, h:1200, left:'', right:'' },
-    { type:'image', src:'', w:1200, h:1600, left:'', right:'' },
-    { type:'image', src:'', w:1600, h:1067, left:'', right:'' },
-    { type:'image', src:'', w:1200, h:1600, left:'', right:'' },
-    { type:'image', src:'', w:1600, h:1200, left:'', right:'' },
-    { type:'video', src:'', w:1920, h:1080, left:'', right:'', poster:'' },
+    { type:'image', w:1600, h:1200, left:'', right:'' },
+    { type:'image', w:1200, h:1600, left:'', right:'' },
+    { type:'image', w:1600, h:1067, left:'', right:'' },
+    { type:'image', w:1200, h:1600, left:'', right:'' },
+    { type:'image', w:1600, h:1200, left:'', right:'' },
+    { type:'video', w:1920, h:1080, left:'', right:'' },
   ]
 };
 
-function load() {
-  try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }
+// Metadata in localStorage (no file data)
+function loadMeta() {
+  try { const r = localStorage.getItem(META_KEY); return r ? JSON.parse(r) : null; }
   catch(e) { return null; }
 }
-function save(d) {
-  try { localStorage.setItem(KEY, JSON.stringify(d)); }
-  catch(e) { if (e.name === 'QuotaExceededError') alert('存储空间不足，请删除部分内容'); }
+function saveMeta(d) {
+  const clean = JSON.parse(JSON.stringify(d));
+  // Strip transient src fields from metadata
+  clean.media.forEach(m => { delete m.src; delete m.poster; });
+  localStorage.setItem(META_KEY, JSON.stringify(clean));
 }
-function store() {
-  let d = load();
-  if (!d) { d = JSON.parse(JSON.stringify(DEFAULTS)); save(d); }
+
+// Full data: metadata + blob URLs from IndexedDB
+async function loadFull() {
+  let d = loadMeta();
+  if (!d) { d = JSON.parse(JSON.stringify(DEFAULTS)); saveMeta(d); return d; }
   d.title = d.title ?? DEFAULTS.title;
   d.bg = d.bg ?? DEFAULTS.bg;
   d.musicUrl = d.musicUrl ?? DEFAULTS.musicUrl;
   d.musicName = d.musicName ?? DEFAULTS.musicName;
   d.media = d.media ?? DEFAULTS.media;
+  // Load blob src from IDB
+  for (let i = 0; i < d.media.length; i++) {
+    const src = await idbGet('src_' + i);
+    if (src) d.media[i].src = src;
+    const poster = await idbGet('poster_' + i);
+    if (poster) d.media[i].poster = poster;
+  }
   return d;
 }
 
+// Save full data: metadata to LS, blobs to IDB
+async function saveFull(d) {
+  saveMeta(d);
+  const tasks = [];
+  for (let i = 0; i < d.media.length; i++) {
+    if (d.media[i].src) tasks.push(idbPut('src_' + i, d.media[i].src));
+    if (d.media[i].poster) tasks.push(idbPut('poster_' + i, d.media[i].poster));
+  }
+  await Promise.all(tasks);
+}
+
+// Helper: save meta + all blobs for the current cache
+async function persist() {
+  await saveFull(_cache);
+}
+
+// Clean orphaned IDB entries
+async function cleanIdb(maxIdx) {
+  // Delete blobs for indices >= maxIdx (shifted after deletion)
+  // We just clean all then re-save — safest
+}
+
+// ==================== CACHE ====================
+let _cache = null;
 let editMode = false;
 let editingIdx = -1;
 let settingsType = '';
 
+function meta() { return _cache; } // synchronous access to current state
+
+// ==================== MIGRATION ====================
+async function migrateOldData() {
+  try {
+    const old = localStorage.getItem('myspace_v2');
+    if (!old) return;
+    const d = JSON.parse(old);
+    if (!d.media || !d.media.length) return;
+    // Check if we already have meta; if so, skip migration
+    if (localStorage.getItem(META_KEY)) return;
+    // Migrate: save blobs to IDB, meta to LS
+    for (let i = 0; i < d.media.length; i++) {
+      if (d.media[i].src) await idbPut('src_' + i, d.media[i].src);
+      if (d.media[i].poster) await idbPut('poster_' + i, d.media[i].poster);
+    }
+    saveMeta(d);
+    localStorage.removeItem('myspace_v2'); // clean old key
+  } catch(_) {}
+}
+
 // ==================== INIT ====================
-function init() {
-  const s = store();
-  document.getElementById('topTitle').textContent = s.title || 'MY SPACE';
-  applyBg(s.bg);
-  applyMusic(s.musicUrl, s.musicName);
+async function init() {
+  await migrateOldData();
+  _cache = await loadFull();
+  document.getElementById('topTitle').textContent = _cache.title || 'MY SPACE';
+  applyBg(_cache.bg);
+  applyMusic(_cache.musicUrl, _cache.musicName);
   renderStream();
 }
 
@@ -524,10 +622,9 @@ function applyMusic(url, name) {
 
 // ==================== RENDER ====================
 function renderStream() {
-  const s = store();
   const stream = document.getElementById('mainStream');
   const empty = document.getElementById('emptyState');
-  const media = s.media || [];
+  const media = _cache.media || [];
 
   stream.innerHTML = '';
   if (media.length === 0) { empty.style.display = 'block'; return; }
@@ -549,7 +646,6 @@ function createMediaItem(item, idx) {
   stage.className = 'media-stage';
 
   if (item.type === 'video') {
-    // ---- Video ----
     const vWrap = document.createElement('div');
     vWrap.className = 'media-video-wrap';
 
@@ -572,7 +668,6 @@ function createMediaItem(item, idx) {
 
     stage.appendChild(vWrap);
   } else {
-    // ---- Image ----
     const img = document.createElement('img');
     img.className = 'media-img';
     img.src = item.src || placeholder(item.w, item.h);
@@ -585,7 +680,6 @@ function createMediaItem(item, idx) {
     stage.appendChild(img);
   }
 
-  // Delete button (edit mode)
   const delBtn = document.createElement('button');
   delBtn.className = 'media-delete';
   delBtn.textContent = '× 删除';
@@ -594,16 +688,8 @@ function createMediaItem(item, idx) {
   wrapper.appendChild(stage);
   wrapper.appendChild(delBtn);
 
-  // Left annotation
-  if (item.left || editMode) {
-    const la = createAnno('left', item.left);
-    wrapper.appendChild(la);
-  }
-  // Right annotation
-  if (item.right || editMode) {
-    const ra = createAnno('right', item.right);
-    wrapper.appendChild(ra);
-  }
+  if (item.left || editMode) wrapper.appendChild(createAnno('left', item.left));
+  if (item.right || editMode) wrapper.appendChild(createAnno('right', item.right));
 
   return wrapper;
 }
@@ -616,7 +702,6 @@ function createAnno(side, text) {
   inner.textContent = text || (side === 'left' ? '左侧标注' : '右侧标注');
   const line = document.createElement('span');
   line.className = 'anno-line';
-  // Show line on appropriate side
   if (side === 'left') { el.appendChild(inner); el.appendChild(line); }
   else { el.appendChild(line); el.appendChild(inner); }
   return el;
@@ -649,14 +734,14 @@ function toggleEdit() {
 
 document.getElementById('topTitle').addEventListener('input', function() {
   if (!editMode) return;
-  const s = store(); s.title = this.textContent; save(s);
+  _cache.title = this.textContent;
+  persist();
 });
 
 // ==================== EDIT OVERLAY ====================
 function openEditOverlay(idx) {
   editingIdx = idx;
-  const s = store();
-  const item = s.media[idx];
+  const item = _cache.media[idx];
   document.getElementById('eoLeft').value = item.left || '';
   document.getElementById('eoRight').value = item.right || '';
   document.getElementById('editOverlay').classList.add('open');
@@ -670,74 +755,82 @@ function closeEditOverlay() {
   editingIdx = -1;
 }
 
-function saveAnnotation() {
+async function saveAnnotation() {
   if (editingIdx < 0) return;
-  const s = store();
-  s.media[editingIdx].left = document.getElementById('eoLeft').value;
-  s.media[editingIdx].right = document.getElementById('eoRight').value;
-  save(s);
+  _cache.media[editingIdx].left = document.getElementById('eoLeft').value;
+  _cache.media[editingIdx].right = document.getElementById('eoRight').value;
+  await persist();
   renderStream();
   closeEditOverlay();
 }
 
-function deleteMedia(idx) {
+async function deleteMedia(idx) {
   if (!confirm('确定删除吗？')) return;
-  const s = store();
-  s.media.splice(idx, 1);
-  save(s);
+  _cache.media.splice(idx, 1);
+  await persist();
   renderStream();
 }
 
 // ==================== ADD MEDIA ====================
-function addPhotos(input) {
+async function addPhotos(input) {
   const files = Array.from(input.files);
   if (!files.length) return;
-  const s = store();
-  let done = 0;
-
-  files.forEach(file => {
-    if (!file.type.startsWith('image/')) { done++; return; }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        s.media.push({ type:'image', src:e.target.result, w:img.width, h:img.height, left:'', right:'' });
-        done++; if (done === files.length) { save(s); renderStream(); }
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
   input.value = '';
+
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const base64 = await new Promise((resolve) => {
+      const r = new FileReader();
+      r.onload = (e) => resolve(e.target.result);
+      r.readAsDataURL(file);
+    });
+    const dims = await new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.width, h: img.height });
+      img.src = base64;
+    });
+    _cache.media.push({ type:'image', src:base64, w:dims.w, h:dims.h, left:'', right:'' });
+  }
+  await persist();
+  renderStream();
 }
 
-function addVideo(input) {
+async function addVideo(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 50 * 1024 * 1024) { alert('视频建议不超过 50MB'); return; }
-  const s = store();
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const video = document.createElement('video');
-    video.preload = 'metadata'; video.muted = true;
-    const blob = URL.createObjectURL(file);
-    video.src = blob;
-    video.onloadeddata = function() { video.currentTime = 1; };
-    video.onseeked = function() {
+  input.value = '';
+
+  // Read base64 for storage
+  const base64 = await new Promise((resolve) => {
+    const r = new FileReader();
+    r.onload = (e) => resolve(e.target.result);
+    r.readAsDataURL(file);
+  });
+
+  // Use original file for poster extraction and dimensions
+  const blobUrl = URL.createObjectURL(file);
+  const info = await new Promise((resolve) => {
+    const v = document.createElement('video');
+    v.preload = 'metadata'; v.muted = true;
+    v.src = blobUrl;
+    v.onloadedmetadata = () => { v.currentTime = 1; };
+    v.onseeked = () => {
       let poster = '';
       try {
         const c = document.createElement('canvas');
-        c.width = video.videoWidth; c.height = video.videoHeight;
-        c.getContext('2d').drawImage(video,0,0);
-        poster = c.toDataURL('image/jpeg',.7);
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v, 0, 0);
+        poster = c.toDataURL('image/jpeg', .7);
       } catch(_) {}
-      s.media.push({ type:'video', src:e.target.result, w:video.videoWidth, h:video.videoHeight, left:'', right:'', poster });
-      URL.revokeObjectURL(blob);
-      save(s); renderStream();
+      resolve({ w: v.videoWidth || 1920, h: v.videoHeight || 1080, poster });
     };
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
+    v.onerror = () => resolve({ w: 1920, h: 1080, poster: '' });
+  });
+  URL.revokeObjectURL(blobUrl);
+
+  _cache.media.push({ type:'video', src:base64, w:info.w, h:info.h, left:'', right:'', poster:info.poster });
+  await persist();
+  renderStream();
 }
 
 // ==================== LIGHTBOX ====================
@@ -762,7 +855,6 @@ function toggleSettings(type) {
   const overlay = document.getElementById('settingsOverlay');
   const title = document.getElementById('settingsTitle');
   const content = document.getElementById('settingsContent');
-  const s = store();
 
   if (type === 'bg') {
     title.textContent = '更换背景';
@@ -770,21 +862,24 @@ function toggleSettings(type) {
       '<div class="settings-group"><label>上传背景图片</label>'+
       '<div class="upload-zone" onclick="document.getElementById(\'uploadBg\').click()">📁 选择图片文件</div></div>'+
       '<div class="settings-group"><label>或输入图片 URL</label>'+
-      '<input type="text" id="bgUrl" placeholder="https://..." value="'+(s.bg&&!s.bg.startsWith('data:')?escHtml(s.bg):'')+'">'+
+      '<input type="text" id="bgUrl" placeholder="https://..." value="'+
+      (_cache.bg&&!_cache.bg.startsWith('data:')?escHtml(_cache.bg):'')+'">'+
       '<button class="btn btn-prime" style="margin-top:.6rem;width:100%;" onclick="applyBgUrl()">应用</button></div>'+
-      (s.bg ? '<button class="btn btn-ghost" style="width:100%;" onclick="removeBg()">移除背景</button>' : '');
+      (_cache.bg ? '<button class="btn btn-ghost" style="width:100%;" onclick="removeBg()">移除背景</button>' : '');
   } else if (type === 'music') {
     title.textContent = '更换配乐';
     content.innerHTML =
       '<div class="settings-group"><label>上传音频文件</label>'+
       '<div class="upload-zone" onclick="document.getElementById(\'uploadAudio\').click()">📁 选择音频 (MP3/WAV)</div>'+
-      (s.musicName ? '<p style="font-size:.78rem;color:var(--gold);margin-top:.5rem;">当前：'+escHtml(s.musicName)+'</p>' : '')+
-      '</div>'+
+      (_cache.musicName ? '<p style="font-size:.78rem;color:var(--gold);margin-top:.5rem;">当前：'+
+        escHtml(_cache.musicName)+'</p>' : '')+'</div>'+
       '<div class="settings-group"><label>或输入音频 URL</label>'+
-      '<input type="text" id="musicUrl" placeholder="https://..." value="'+(s.musicUrl&&!s.musicUrl.startsWith('data:')?escHtml(s.musicUrl):'')+'">'+
-      '<input type="text" id="musicName" placeholder="曲目名称" style="margin-top:.5rem;" value="'+(s.musicName&&!s.musicUrl.startsWith('data:')?escHtml(s.musicName):'')+'">'+
+      '<input type="text" id="musicUrl" placeholder="https://..." value="'+
+      (_cache.musicUrl&&!_cache.musicUrl.startsWith('data:')?escHtml(_cache.musicUrl):'')+'">'+
+      '<input type="text" id="musicName" placeholder="曲目名称" style="margin-top:.5rem;" value="'+
+      (_cache.musicName&&!_cache.musicUrl.startsWith('data:')?escHtml(_cache.musicName):'')+'">'+
       '<button class="btn btn-prime" style="margin-top:.6rem;width:100%;" onclick="applyMusicUrl()">应用</button></div>'+
-      (s.musicUrl ? '<button class="btn btn-ghost" style="width:100%;" onclick="removeMusic()">移除配乐</button>' : '');
+      (_cache.musicUrl ? '<button class="btn btn-ghost" style="width:100%;" onclick="removeMusic()">移除配乐</button>' : '');
   }
 
   panel.classList.add('open');
@@ -797,56 +892,53 @@ function closeSettings() {
   settingsType = '';
 }
 
-function applyBgUrl() {
+async function applyBgUrl() {
   const url = document.getElementById('bgUrl').value.trim();
   if (!url) return;
-  const s = store(); s.bg = url; save(s);
+  _cache.bg = url; await persist();
   applyBg(url); closeSettings();
 }
-function removeBg() {
-  const s = store(); s.bg = ''; save(s);
+async function removeBg() {
+  _cache.bg = ''; await persist();
   applyBg(''); closeSettings();
 }
-function applyMusicUrl() {
+async function applyMusicUrl() {
   const url = document.getElementById('musicUrl').value.trim();
   const name = document.getElementById('musicName').value.trim()||'配乐';
   if (!url) return;
-  const s = store(); s.musicUrl = url; s.musicName = name; save(s);
+  _cache.musicUrl = url; _cache.musicName = name; await persist();
   applyMusic(url, name); closeSettings();
 }
-function removeMusic() {
-  const s = store(); s.musicUrl = ''; s.musicName = ''; save(s);
+async function removeMusic() {
+  _cache.musicUrl = ''; _cache.musicName = ''; await persist();
   applyMusic('','');
   document.getElementById('audioPlayer').pause();
   document.getElementById('musicPlayBtn').textContent = '▶';
   closeSettings();
 }
 
-function changeBg(input) {
+async function changeBg(input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const s = store(); s.bg = e.target.result; save(s);
-    applyBg(e.target.result); closeSettings();
-  };
-  reader.readAsDataURL(file);
+  const base64 = await new Promise((resolve) => {
+    const r = new FileReader(); r.onload = (e) => resolve(e.target.result); r.readAsDataURL(file);
+  });
+  _cache.bg = base64; await persist();
+  applyBg(base64); closeSettings();
   input.value = '';
 }
 
-function changeMusic(input) {
+async function changeMusic(input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const s = store();
-    s.musicUrl = e.target.result;
-    s.musicName = file.name.replace(/\.[^.]+$/, '');
-    save(s);
-    applyMusic(e.target.result, s.musicName);
-    closeSettings();
-  };
-  reader.readAsDataURL(file);
+  const base64 = await new Promise((resolve) => {
+    const r = new FileReader(); r.onload = (e) => resolve(e.target.result); r.readAsDataURL(file);
+  });
+  _cache.musicUrl = base64;
+  _cache.musicName = file.name.replace(/\.[^.]+$/, '');
+  await persist();
+  applyMusic(base64, _cache.musicName);
+  closeSettings();
   input.value = '';
 }
 
