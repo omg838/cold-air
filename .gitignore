@@ -1,0 +1,58 @@
+# --- 操作系统 ---
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# --- 编辑器 / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+
+# --- 依赖 ---
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+*.pyo
+*.class
+.env/
+venv/
+.venv/
+
+# --- 构建输出 ---
+dist/
+build/
+out/
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.obj
+
+# --- 日志 / 缓存 ---
+*.log
+*.tmp
+*.cache
+.cache/
+
+# --- 环境配置 ---
+.env
+.env.local
+.env.*.local
+*.local
+
+# --- 压缩包 ---
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# --- 其他 ---
+*.bak
+*.orig
