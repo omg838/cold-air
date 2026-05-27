@@ -3,506 +3,447 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的空间</title>
+<title>My Space</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #faf8f5;
-  --text: #2c2416;
-  --text-light: #6b6358;
-  --accent: #b8944b;
-  --accent-dark: #9a7b3a;
-  --card: #fff;
-  --card-hover: #fdfaf5;
-  --border: #e8e0d5;
-  --shadow: 0 4px 24px rgba(0,0,0,.06);
-  --shadow-lg: 0 12px 48px rgba(0,0,0,.1);
-  --radius: 12px;
-  --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --max-w: 1100px;
+  --bg: #1a1a1c;
+  --surface: #242427;
+  --text: #d4cfc7;
+  --text-dim: #999590;
+  --gold: #c9a96e;
+  --gold-light: #dcc89b;
+  --gold-dim: #8a7348;
+  --radius: 6px;
+  --transition: 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
-
-html { scroll-behavior:smooth; font-size:16px; }
+html { scroll-behavior:smooth; font-size:16px; background:var(--bg); }
 
 body {
-  font-family: 'Noto Serif SC', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+  font-family: 'Noto Serif SC', 'Cormorant Garamond', Georgia, serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  transition: background .6s;
 }
 
-/* ===== Navbar ===== */
-.nav {
-  position: fixed; top:0; left:0; right:0; z-index:100;
-  background: rgba(250,248,245,.85); backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 2rem;
-  transition: var(--transition);
+/* ===== Background Layer ===== */
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0;
+  background: var(--bg);
+  transition: opacity .8s;
 }
-.nav-inner {
-  max-width: var(--max-w); margin:0 auto;
-  display:flex; align-items:center; justify-content:space-between;
-  height: 60px;
+.bg-layer.has-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
-.nav-links { display:flex; gap:2rem; list-style:none; }
-.nav-links a {
-  text-decoration:none; color:var(--text-light);
-  font-size:.9rem; letter-spacing:.5px;
-  transition: var(--transition);
-}
-.nav-links a:hover { color:var(--accent); }
-.nav-title { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); font-weight:600; }
-.nav-actions { display:flex; align-items:center; gap:1rem; }
-
-/* Edit toggle */
-.edit-toggle {
-  display:flex; align-items:center; gap:.5rem;
-  cursor:pointer; font-size:.85rem; color:var(--text-light);
-  user-select:none;
-}
-.edit-switch {
-  width:42px; height:24px; background:var(--border);
-  border-radius:12px; position:relative;
-  transition: var(--transition);
-}
-.edit-switch::after {
-  content:''; position:absolute; top:3px; left:3px;
-  width:18px; height:18px; background:#fff;
-  border-radius:50%; transition: var(--transition);
-}
-.edit-toggle.active .edit-switch { background:var(--accent); }
-.edit-toggle.active .edit-switch::after { transform:translateX(18px); }
-.edit-toggle.active .edit-label { color:var(--accent); }
-
-/* ===== Hero ===== */
-.hero {
-  min-height:100vh; display:flex; align-items:center; justify-content:center;
-  text-align:center; position:relative;
-  background: linear-gradient(135deg, #faf8f5 0%, #f0ebe0 40%, #e8dfd0 100%);
-  padding: 6rem 2rem 4rem;
-}
-.hero::before {
-  content:''; position:absolute; inset:0;
-  background: radial-gradient(ellipse at 50% 40%, rgba(184,148,75,.08) 0%, transparent 70%);
-}
-.hero-content { position:relative; z-index:1; max-width:600px; }
-.hero-avatar {
-  width:120px; height:120px; border-radius:50%;
-  object-fit:cover; border:3px solid var(--accent);
-  box-shadow: 0 8px 32px rgba(184,148,75,.2);
-  margin-bottom:2rem;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.hero-avatar:hover { transform:scale(1.05); }
-.hero h1 {
-  font-family:'Playfair Display',serif;
-  font-size:3.5rem; font-weight:600;
-  letter-spacing:2px; margin-bottom:.5rem;
-  color: var(--text);
-}
-.hero .tagline {
-  font-size:1.15rem; color:var(--text-light);
-  letter-spacing:1px; margin-bottom:2rem;
-}
-.hero-scroll {
-  position:absolute; bottom:2rem; left:50%; transform:translateX(-50%);
-  animation: floatDown 2s ease-in-out infinite;
-  color: var(--accent); font-size:1.5rem; cursor:default;
-}
-@keyframes floatDown { 0%,100% { transform:translateX(-50%) translateY(0); opacity:.6; } 50% { transform:translateX(-50%) translateY(8px); opacity:1; } }
-
-/* ===== Section Common ===== */
-.section {
-  max-width:var(--max-w); margin:0 auto;
-  padding: 6rem 2rem;
-}
-.section-header {
-  text-align:center; margin-bottom:4rem;
-}
-.section-header h2 {
-  font-family:'Playfair Display',serif;
-  font-size:2.2rem; font-weight:600;
-  letter-spacing:1px; margin-bottom:.8rem;
-}
-.section-header .line {
-  width:50px; height:2px; background:var(--accent);
-  margin:0 auto; border-radius:1px;
-}
-.section-header p { color:var(--text-light); margin-top:1rem; font-size:.95rem; }
-
-/* ===== About ===== */
-.about-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:3rem;
-  align-items:start;
-}
-.about-text {
-  font-size:1rem; line-height:2;
-  color:var(--text-light);
-  min-height:100px;
-  padding:1rem; border-radius:var(--radius);
-  border:1px solid transparent;
-  transition: var(--transition);
-}
-.about-text:focus { outline:none; border-color:var(--accent); background:var(--card); }
-.timeline { list-style:none; }
-.timeline li {
-  position:relative; padding-left:2rem; padding-bottom:2rem;
-  border-left:2px solid var(--border);
-}
-.timeline li:last-child { padding-bottom:0; }
-.timeline li::before {
-  content:''; position:absolute; left:-6px; top:6px;
-  width:10px; height:10px; background:var(--accent);
-  border-radius:50%;
-}
-.timeline .year {
-  font-size:.85rem; color:var(--accent);
-  font-weight:600; letter-spacing:1px;
-}
-.timeline .desc { font-size:.95rem; color:var(--text-light); margin-top:.2rem; min-height:1.5rem; }
-.contact-row { display:flex; gap:2rem; flex-wrap:wrap; margin-top:2rem; }
-.contact-item { display:flex; align-items:center; gap:.6rem; color:var(--text-light); font-size:.95rem; }
-.contact-item svg { flex-shrink:0; }
-
-/* ===== Gallery ===== */
-.gallery-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-  gap:1.5rem;
-}
-.gallery-card {
-  position:relative; border-radius:var(--radius);
-  overflow:hidden; cursor:pointer;
-  aspect-ratio:4/3;
-  background:var(--border);
-  transition: var(--transition);
-  box-shadow: var(--shadow);
-}
-.gallery-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
-.gallery-card img {
-  width:100%; height:100%; object-fit:cover;
-  transition: var(--transition);
-}
-.gallery-card:hover img { transform:scale(1.05); }
-.gallery-card .del-btn {
-  display:none; position:absolute; top:.5rem; right:.5rem;
-  width:28px; height:28px; background:rgba(0,0,0,.6); color:#fff;
-  border:none; border-radius:50%; cursor:pointer;
-  font-size:1rem; line-height:28px; text-align:center;
-  z-index:2;
-}
-.edit-mode .gallery-card .del-btn { display:block; }
-.gallery-upload {
-  display:none; aspect-ratio:4/3;
-  border:2px dashed var(--border); border-radius:var(--radius);
-  flex-direction:column; align-items:center; justify-content:center;
-  cursor:pointer; color:var(--text-light); gap:.5rem;
-  transition: var(--transition);
-}
-.edit-mode .gallery-upload { display:flex; }
-.gallery-upload:hover { border-color:var(--accent); color:var(--accent); }
-.gallery-upload svg { width:36px; height:36px; }
-
-/* Lightbox */
-.lightbox {
-  display:none; position:fixed; inset:0; z-index:200;
-  background:rgba(0,0,0,.92); align-items:center; justify-content:center;
-  cursor:pointer;
-}
-.lightbox.open { display:flex; }
-.lightbox img { max-width:90vw; max-height:85vh; object-fit:contain; border-radius:4px; }
-.lightbox-close {
-  position:absolute; top:1.5rem; right:2rem;
-  color:#fff; font-size:2rem; cursor:pointer;
-  background:none; border:none; z-index:201;
+.bg-layer::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.55);
 }
 
-/* ===== Video ===== */
-.video-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(380px, 1fr));
-  gap:2rem;
+/* ===== Top Bar ===== */
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2rem;
+  background: linear-gradient(to bottom, rgba(26,26,28,.9), transparent);
+  pointer-events: none;
 }
-.video-card {
-  background:var(--card); border-radius:var(--radius);
-  overflow:hidden; box-shadow:var(--shadow);
+.top-bar > * { pointer-events: auto; }
+.site-title {
+  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 300; letter-spacing: 3px;
+  color: var(--text-dim); text-transform: uppercase;
+}
+.top-actions {
+  display: flex; gap: .5rem; align-items: center;
+}
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.3); color: var(--text-dim);
+  cursor: pointer; font-size: .95rem;
+  display: flex; align-items: center; justify-content: center;
   transition: var(--transition);
-  position:relative;
+  backdrop-filter: blur(8px);
+  position: relative;
 }
-.video-card:hover { box-shadow:var(--shadow-lg); }
-.video-wrapper {
-  position:relative; padding-bottom:56.25%; height:0;
-  background:#000;
+.icon-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(0,0,0,.5); }
+.icon-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,.15); }
+.icon-btn .tooltip {
+  display: none; position: absolute; top: 110%; right: 0;
+  white-space: nowrap; font-size: .75rem; color: var(--text-dim);
+  background: rgba(0,0,0,.8); padding: .3rem .7rem; border-radius: 4px;
+  pointer-events: none;
 }
-.video-wrapper iframe {
-  position:absolute; inset:0; width:100%; height:100%; border:0;
-}
-.video-card .del-btn {
-  display:none; position:absolute; top:.5rem; right:.5rem;
-  width:28px; height:28px; background:rgba(0,0,0,.6); color:#fff;
-  border:none; border-radius:50%; cursor:pointer; z-index:2;
-  font-size:1rem; line-height:28px; text-align:center;
-}
-.edit-mode .video-card .del-btn { display:block; }
-.video-add {
-  display:none; background:var(--card); border-radius:var(--radius);
-  padding:2rem; box-shadow:var(--shadow);
-}
-.edit-mode .video-add { display:block; }
-.video-add input {
-  width:100%; padding:.8rem 1rem; border:1px solid var(--border);
-  border-radius:var(--radius); font-family:inherit; font-size:.95rem;
-  margin-bottom:.8rem;
-}
-.video-add .btn { margin-right:.5rem; }
+.icon-btn:hover .tooltip { display: block; }
 
-/* ===== Diary ===== */
-.diary-list { display:flex; flex-direction:column; gap:2rem; }
-.diary-card {
-  background:var(--card); border-radius:var(--radius);
-  padding:2.5rem; box-shadow:var(--shadow);
+/* ===== Main Media Stage ===== */
+.media-stage {
+  position: relative; z-index: 1;
+  max-width: 1400px; margin: 0 auto;
+  padding: 5rem 1.5rem 3rem;
+  min-height: 100vh;
+}
+.media-grid {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  align-items: flex-start; gap: .8rem;
+  padding: 2rem 0;
+}
+
+/* ===== Media Card ===== */
+.media-card {
+  position: relative;
+  display: flex; align-items: center;
+  flex-shrink: 0;
+  transition: transform var(--transition), z-index 0s;
+  z-index: 1;
+  cursor: default;
+}
+.media-card:hover { z-index: 20; }
+
+.media-card-inner {
+  position: relative;
+  display: flex; align-items: center;
+  border-radius: var(--radius);
+  overflow: visible;
+  transition: transform var(--transition), box-shadow var(--transition);
+  background: var(--surface);
+}
+.media-card:hover .media-card-inner {
+  transform: scale(1.18);
+  box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+}
+
+/* Image wrapper */
+.media-img-wrap {
+  position: relative; overflow: hidden;
+  border-radius: var(--radius);
+  flex-shrink: 0;
+}
+.media-img-wrap img {
+  display: block; height: 100%; width: auto;
+  object-fit: cover; border-radius: var(--radius);
+  transition: transform .6s cubic-bezier(.25,.46,.45,.94);
+}
+.media-card:hover .media-img-wrap img {
+  transform: scale(1.03);
+}
+
+/* ===== Annotations ===== */
+.annotation {
+  flex-shrink: 0;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: width var(--transition), opacity var(--transition), padding var(--transition);
+  color: var(--gold-light);
+  font-size: .9rem;
+  writing-mode: horizontal-tb;
+  max-width: 180px;
+}
+.annotation-inner {
+  padding: 0 1.2rem;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 300; letter-spacing: 1px;
+  line-height: 1.6;
+  font-style: italic;
+  color: var(--gold-light);
+  text-shadow: 0 1px 4px rgba(0,0,0,.5);
+  white-space: normal;
+  word-break: break-word;
+}
+.annotation-left { text-align: right; }
+.annotation-right { text-align: left; }
+
+.media-card:hover .annotation {
+  width: 180px; opacity: 1;
+}
+.media-card:hover .annotation-left { padding-right: 0; }
+.media-card:hover .annotation-right { padding-left: 0; }
+.media-card:hover .annotation-inner { padding: 0 1.2rem; }
+
+/* Dim other cards when one is hovered */
+.media-grid:hover .media-card:not(:hover) .media-card-inner {
+  transform: scale(0.92);
+  filter: brightness(.55) blur(1px);
+}
+
+/* ===== Video Card ===== */
+.video-wrap {
+  position: relative; border-radius: var(--radius); overflow: hidden;
+  cursor: pointer; background: #000;
+}
+.video-wrap video {
+  display: block; border-radius: var(--radius);
+  object-fit: cover;
+}
+.video-wrap .play-hint {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.35);
+  transition: opacity .3s;
+  pointer-events: none;
+}
+.video-wrap .play-hint::after {
+  content: '▶'; font-size: 2.5rem; color: rgba(255,255,255,.8);
+  text-shadow: 0 2px 8px rgba(0,0,0,.5);
+  transition: transform .3s;
+}
+.video-wrap:hover .play-hint { opacity: 0; }
+.video-wrap.playing .play-hint { opacity: 0; }
+
+/* ===== Edit Mode ===== */
+.edit-mode .media-card { cursor: pointer; }
+.edit-mode .media-card:hover .media-card-inner {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px var(--gold), 0 12px 40px rgba(0,0,0,.5);
+}
+.edit-mode .media-grid:hover .media-card:not(:hover) .media-card-inner {
+  transform: scale(0.95); filter: brightness(.7);
+}
+.edit-mode .annotation { width: 140px !important; opacity: .7 !important; }
+.edit-mode .annotation-inner {
+  outline: 1px dashed rgba(201,169,110,.3);
+  border-radius: 4px; padding: .5rem .8rem !important;
+  font-style: normal; font-size: .8rem; cursor: text;
+}
+.edit-mode .annotation-inner:focus {
+  outline: 1px solid var(--gold);
+  color: #fff;
+}
+
+/* ===== Add Media Buttons (edit mode) ===== */
+.add-media-bar {
+  display: none; position: fixed; bottom: 2rem; left: 50%;
+  transform: translateX(-50%); z-index: 50;
+  gap: 1rem;
+}
+.edit-mode .add-media-bar { display: flex; }
+.add-media-btn {
+  padding: .7rem 1.5rem; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(0,0,0,.6); color: var(--gold);
+  cursor: pointer; font-family: inherit; font-size: .85rem;
+  letter-spacing: 1px; backdrop-filter: blur(8px);
   transition: var(--transition);
-  position:relative;
 }
-.diary-card:hover { box-shadow:var(--shadow-lg); }
-.diary-card .date {
-  font-size:.85rem; color:var(--accent);
-  letter-spacing:1px; font-weight:500;
-  margin-bottom:.5rem;
-}
-.diary-card h3 {
-  font-family:'Playfair Display',serif;
-  font-size:1.5rem; margin-bottom:1rem;
-  color:var(--text);
-}
-.diary-card .content { color:var(--text-light); line-height:2; min-height:2rem; }
-.diary-card .del-btn {
-  display:none; position:absolute; top:1rem; right:1rem;
-  background:none; border:none; color:#c44; cursor:pointer;
-  font-size:1.2rem;
-}
-.edit-mode .diary-card .del-btn { display:block; }
-.diary-add {
-  display:none; background:var(--card); border-radius:var(--radius);
-  padding:2rem; box-shadow:var(--shadow);
-}
-.edit-mode .diary-add { display:block; }
-.diary-add input, .diary-add textarea {
-  width:100%; padding:.8rem 1rem; border:1px solid var(--border);
-  border-radius:var(--radius); font-family:inherit; font-size:.95rem;
-  margin-bottom:1rem;
-}
-.diary-add textarea { min-height:120px; resize:vertical; }
+.add-media-btn:hover { border-color: var(--gold); background: rgba(201,169,110,.15); }
 
-/* Buttons */
+/* ===== Media Edit Overlay (edit mode on click) ===== */
+.edit-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.85); align-items: center; justify-content: center;
+}
+.edit-overlay.open { display: flex; }
+.edit-overlay-content {
+  background: var(--surface); border-radius: 12px;
+  padding: 2rem; max-width: 500px; width: 90%;
+  border: 1px solid rgba(255,255,255,.1);
+}
+.edit-overlay-content h3 { font-weight: 400; margin-bottom: 1.5rem; color: var(--gold); }
+.edit-overlay-content input, .edit-overlay-content textarea {
+  width: 100%; padding: .8rem 1rem; margin-bottom: 1rem;
+  background: var(--bg); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px; color: var(--text); font-family: inherit; font-size: .9rem;
+}
+.edit-overlay-content textarea { min-height: 80px; resize: vertical; }
+.edit-overlay-content .btn-row { display: flex; gap: .5rem; justify-content: flex-end; }
+
 .btn {
-  display:inline-block; padding:.7rem 1.8rem;
-  background:var(--accent); color:#fff; border:none;
-  border-radius:6px; cursor:pointer; font-family:inherit;
-  font-size:.9rem; letter-spacing:.5px;
+  padding: .6rem 1.4rem; border-radius: 6px; cursor: pointer;
+  font-family: inherit; font-size: .85rem; border: none; transition: var(--transition);
+}
+.btn-primary { background: var(--gold); color: #1a1a1c; }
+.btn-primary:hover { background: var(--gold-light); }
+.btn-danger { background: transparent; color: #c44; border: 1px solid rgba(204,68,68,.3); }
+.btn-danger:hover { background: rgba(204,68,68,.1); }
+.btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,.1); }
+.btn-secondary:hover { border-color: rgba(255,255,255,.3); }
+
+/* ===== Lightbox ===== */
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,.94); align-items: center; justify-content: center;
+  cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px; }
+.lightbox-close {
+  position: absolute; top: 1.5rem; right: 2rem;
+  color: rgba(255,255,255,.6); font-size: 2.5rem; cursor: pointer;
+  background: none; border: none; z-index: 301; font-weight: 300;
+}
+
+/* ===== Music Mini Player ===== */
+.music-mini {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 80;
+  display: flex; align-items: center; gap: .6rem;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(12px);
+  border-radius: 999px; padding: .5rem .9rem .5rem .5rem;
+  border: 1px solid rgba(255,255,255,.08);
   transition: var(--transition);
 }
-.btn:hover { background:var(--accent-dark); }
-.btn-outline {
-  background:transparent; border:1px solid var(--accent);
-  color:var(--accent);
-}
-.btn-outline:hover { background:var(--accent); color:#fff; }
-.btn-sm { padding:.4rem 1rem; font-size:.8rem; }
-
-/* ===== Music Player ===== */
-.music-player {
-  position:fixed; bottom:1.5rem; right:1.5rem; z-index:150;
-  background:var(--card); border-radius:var(--radius);
-  padding:.8rem 1.2rem; box-shadow:var(--shadow-lg);
-  display:flex; align-items:center; gap:.8rem;
+.music-mini:hover { border-color: rgba(255,255,255,.2); }
+.music-mini-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,.1);
+  color: var(--text-dim); cursor: pointer; font-size: .8rem;
+  display: flex; align-items: center; justify-content: center;
   transition: var(--transition);
-  max-width:320px;
 }
-.music-btn {
-  width:36px; height:36px; border-radius:50%;
-  border:1px solid var(--border); background:var(--card);
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-  transition: var(--transition); color:var(--text);
-  flex-shrink:0;
+.music-mini-btn:hover { background: var(--gold); color: #1a1a1c; }
+.music-mini-info {
+  font-size: .75rem; color: var(--text-dim);
+  max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer;
 }
-.music-btn:hover { border-color:var(--accent); color:var(--accent); }
-.music-btn.playing { background:var(--accent); border-color:var(--accent); color:#fff; }
-.music-info { flex:1; min-width:0; }
-.music-info .track-name {
-  font-size:.85rem; white-space:nowrap; overflow:hidden;
-  text-overflow:ellipsis; color:var(--text);
-}
-.music-info .track-artist {
-  font-size:.75rem; color:var(--text-light);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.music-select {
-  display:none; position:absolute; bottom:100%;
-  right:0; margin-bottom:.5rem;
-  background:var(--card); border-radius:var(--radius);
-  box-shadow:var(--shadow-lg); padding:.5rem;
-  min-width:220px;
-}
-.music-select.open { display:block; }
-.music-select .track-option {
-  padding:.6rem 1rem; cursor:pointer; border-radius:6px;
-  font-size:.9rem; transition:background .2s;
-  display:flex; align-items:center; justify-content:space-between;
-}
-.music-select .track-option:hover { background:var(--card-hover); }
-.music-select .track-option.active { color:var(--accent); font-weight:500; }
+.music-mini-info:hover { color: var(--gold); }
 
-/* Edit mode helpers */
-.edit-mode [contenteditable]:focus {
-  outline:2px solid var(--accent); outline-offset:4px;
-  border-radius:4px;
+/* ===== Settings Panel ===== */
+.settings-panel {
+  position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
+  z-index: 150; background: var(--surface);
+  border-left: 1px solid rgba(255,255,255,.08);
+  transition: right var(--transition); padding: 4rem 2rem 2rem;
+  overflow-y: auto;
 }
-.edit-mode .hero-avatar { cursor:pointer; position:relative; }
-.edit-mode .hero-avatar::after {
-  content:'点击更换'; position:absolute; bottom:0; left:50%;
-  transform:translateX(-50%); background:rgba(0,0,0,.7); color:#fff;
-  padding:.2rem .8rem; border-radius:999px; font-size:.7rem;
-  white-space:nowrap;
+.settings-panel.open { right: 0; }
+.settings-panel h3 {
+  font-weight: 400; color: var(--gold); margin-bottom: 1.5rem;
+  font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; letter-spacing: 1px;
 }
-.edit-hint {
-  display:none; text-align:center; padding:.5rem;
-  background:var(--accent); color:#fff; font-size:.85rem;
-  position:fixed; top:60px; left:0; right:0; z-index:99;
+.settings-group { margin-bottom: 2rem; }
+.settings-group label {
+  display: block; font-size: .8rem; color: var(--text-dim);
+  margin-bottom: .5rem; letter-spacing: .5px;
 }
-.edit-mode .edit-hint { display:block; }
+.settings-group input {
+  width: 100%; padding: .7rem 1rem; background: var(--bg);
+  border: 1px solid rgba(255,255,255,.08); border-radius: 6px;
+  color: var(--text); font-family: inherit; font-size: .85rem;
+}
+.settings-upload {
+  display: flex; align-items: center; gap: .8rem; padding: .7rem 1rem;
+  background: var(--bg); border: 1px dashed rgba(255,255,255,.12);
+  border-radius: 6px; cursor: pointer; color: var(--text-dim);
+  font-size: .85rem; transition: var(--transition);
+}
+.settings-upload:hover { border-color: var(--gold); color: var(--gold); }
+.settings-overlay {
+  display: none; position: fixed; inset: 0; z-index: 140;
+  background: rgba(0,0,0,.3);
+}
+.settings-overlay.open { display: block; }
 
-/* Animations */
-.fade-in {
-  opacity:0; transform:translateY(24px);
-  transition: opacity .8s ease, transform .8s ease;
+/* ===== Empty State ===== */
+.empty-hint {
+  text-align: center; padding: 6rem 2rem;
+  color: var(--text-dim); font-size: 1rem; font-weight: 300;
 }
-.fade-in.visible { opacity:1; transform:translateY(0); }
+.empty-hint span { color: var(--gold); cursor: pointer; }
 
-/* Responsive */
-@media (max-width:768px) {
-  .hero h1 { font-size:2.2rem; }
-  .about-grid { grid-template-columns:1fr; }
-  .video-grid { grid-template-columns:1fr; }
-  .nav-links { gap:1rem; }
-  .nav-links a { font-size:.8rem; }
-  .section { padding:4rem 1.2rem; }
-  .diary-card { padding:1.5rem; }
-  .music-player { bottom:.8rem; right:.8rem; padding:.6rem .8rem; }
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+
+/* ===== Animations ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-@media (max-width:480px) {
-  .nav { padding:0 1rem; }
-  .nav-links { gap:.6rem; }
-  .hero h1 { font-size:1.8rem; }
-  .gallery-grid { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
-  .music-player { max-width:260px; }
+.media-card { animation: fadeUp .8s ease both; }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .media-grid { gap: .5rem; }
+  .media-card:hover .annotation { width: 100px !important; }
+  .media-card:hover .annotation-inner { padding: 0 .5rem !important; font-size: .75rem; }
+  .media-card:hover .media-card-inner { transform: scale(1.08); }
+  .top-bar { padding: .8rem 1rem; }
+  .settings-panel { width: 320px; right: -340px; }
+  .edit-overlay-content { max-width: 90%; padding: 1.5rem; }
+}
+@media (max-width: 600px) {
+  .media-stage { padding: 4rem .5rem 2rem; }
+  .media-card { width: 100% !important; }
+  .media-card:hover .annotation { width: 0 !important; opacity: 0 !important; }
+  .media-card:hover .media-card-inner { transform: scale(1.03); }
+  .media-grid:hover .media-card:not(:hover) .media-card-inner { filter: brightness(.7) blur(0); }
+  .add-media-bar { bottom: 1rem; gap: .5rem; }
+  .add-media-btn { padding: .5rem 1rem; font-size: .75rem; }
+  .music-mini { bottom: .8rem; right: .8rem; }
 }
 </style>
 </head>
 <body>
 
-<!-- Edit hint -->
-<div class="edit-hint" id="editHint">编辑模式已开启 — 点击文字即可编辑，更改自动保存</div>
+<!-- Background -->
+<div class="bg-layer" id="bgLayer"></div>
 
-<!-- Nav -->
-<nav class="nav" id="nav">
-  <div class="nav-inner">
-    <span class="nav-title">My Space</span>
-    <ul class="nav-links">
-      <li><a href="#about">关于</a></li>
-      <li><a href="#gallery">影像</a></li>
-      <li><a href="#video">视频</a></li>
-      <li><a href="#diary">随笔</a></li>
-    </ul>
-    <div class="nav-actions">
-      <div class="edit-toggle" id="editToggle" onclick="toggleEditMode()">
-        <span class="edit-label">编辑</span>
-        <div class="edit-switch"></div>
-      </div>
+<!-- Top Bar -->
+<header class="top-bar">
+  <span class="site-title" id="siteTitle" contenteditable="false">MY SPACE</span>
+  <div class="top-actions">
+    <button class="icon-btn" id="bgBtn" onclick="toggleSettings('bg')" title="更换背景">
+      🖼<span class="tooltip">更换背景</span>
+    </button>
+    <button class="icon-btn" id="musicBtn" onclick="toggleSettings('music')" title="更换配乐">
+      ♪<span class="tooltip">更换配乐</span>
+    </button>
+    <button class="icon-btn" id="editToggle" onclick="toggleEditMode()" title="编辑">
+      ✎<span class="tooltip">编辑模式</span>
+    </button>
+  </div>
+</header>
+
+<!-- Media Stage -->
+<main class="media-stage" id="mediaStage">
+  <div class="media-grid" id="mediaGrid"></div>
+  <div class="empty-hint" id="emptyHint" style="display:none">
+    还没有内容，<span onclick="document.getElementById('uploadPhoto').click()">上传照片</span> 或 <span onclick="document.getElementById('uploadVideoInput').click()">添加视频</span> 开始吧
+  </div>
+</main>
+
+<!-- Add Media Bar (Edit Mode) -->
+<div class="add-media-bar" id="addMediaBar">
+  <button class="add-media-btn" onclick="document.getElementById('uploadPhoto').click()">＋ 添加照片</button>
+  <button class="add-media-btn" onclick="document.getElementById('uploadVideoInput').click()">＋ 添加视频</button>
+</div>
+
+<!-- Settings Panel -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="settings-panel" id="settingsPanel">
+  <h3 id="settingsTitle">设置</h3>
+  <div id="settingsContent"></div>
+</div>
+
+<!-- Edit Overlay (for annotations) -->
+<div class="edit-overlay" id="editOverlay">
+  <div class="edit-overlay-content">
+    <h3>编辑标注</h3>
+    <label style="font-size:.8rem;color:var(--text-dim);">左侧文字</label>
+    <textarea id="editLeftAnno" placeholder="鼠标悬停时显示在左侧的文字..."></textarea>
+    <label style="font-size:.8rem;color:var(--text-dim);">右侧文字</label>
+    <textarea id="editRightAnno" placeholder="鼠标悬停时显示在右侧的文字..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-danger" id="editDeleteBtn" style="margin-right:auto;">删除</button>
+      <button class="btn btn-secondary" onclick="closeEditOverlay()">取消</button>
+      <button class="btn btn-primary" onclick="saveAnnotation()">保存</button>
     </div>
   </div>
-</nav>
-
-<!-- Hero -->
-<section class="hero" id="hero">
-  <div class="hero-content">
-    <img class="hero-avatar" id="heroAvatar" src="" alt="头像" title="点击更换头像" onclick="if(editMode) document.getElementById('avatarInput').click()">
-    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="changeAvatar(this)">
-    <h1 contenteditable="false" id="heroName" data-key="hero_name">杨 振浩</h1>
-    <p class="tagline" contenteditable="false" id="heroTagline" data-key="hero_tagline">记录光影 · 珍藏时光</p>
-  </div>
-  <div class="hero-scroll">↓</div>
-</section>
-
-<!-- About -->
-<section class="section" id="about">
-  <div class="section-header">
-    <h2>关于我</h2>
-    <div class="line"></div>
-  </div>
-  <div class="about-grid">
-    <div>
-      <div class="about-text" contenteditable="false" id="aboutBio" data-key="about_bio">这里是一段自我介绍。点击编辑按钮可以修改这段文字，写下你的故事、你的兴趣、你的一切。</div>
-      <div class="contact-row">
-        <span class="contact-item">📧 <span contenteditable="false" data-key="contact_email">example@email.com</span></span>
-        <span class="contact-item">📍 <span contenteditable="false" data-key="contact_loc">中国</span></span>
-        <span class="contact-item">🔗 <span contenteditable="false" data-key="contact_web">个人网站</span></span>
-      </div>
-    </div>
-    <ul class="timeline" id="timeline">
-      <li><div class="year" contenteditable="false" data-key="tl_year_0">2024</div><div class="desc" contenteditable="false" data-key="tl_desc_0">开启新的旅程，学习前端开发</div></li>
-      <li><div class="year" contenteditable="false" data-key="tl_year_1">2023</div><div class="desc" contenteditable="false" data-key="tl_desc_1">完成大学学业，获得计算机科学学位</div></li>
-      <li><div class="year" contenteditable="false" data-key="tl_year_2">2020</div><div class="desc" contenteditable="false" data-key="tl_desc_2">第一次接触编程，被创造的魅力吸引</div></li>
-    </ul>
-  </div>
-</section>
-
-<!-- Gallery -->
-<section class="section" id="gallery">
-  <div class="section-header">
-    <h2>影像集</h2>
-    <div class="line"></div>
-    <p>用镜头捕捉生活的温度</p>
-  </div>
-  <div class="gallery-grid" id="galleryGrid"></div>
-  <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="addPhotos(this)">
-</section>
-
-<!-- Video -->
-<section class="section" id="video">
-  <div class="section-header">
-    <h2>视频墙</h2>
-    <div class="line"></div>
-    <p>记录那些动人的瞬间</p>
-  </div>
-  <div class="video-grid" id="videoGrid"></div>
-  <div class="video-add" id="videoAdd">
-    <input type="text" id="videoUrlInput" placeholder="输入 YouTube 或 Vimeo 嵌入链接 (如: https://www.youtube.com/embed/...)">
-    <button class="btn" onclick="addVideo()">添加视频</button>
-  </div>
-</section>
-
-<!-- Diary -->
-<section class="section" id="diary">
-  <div class="section-header">
-    <h2>随笔记</h2>
-    <div class="line"></div>
-    <p>写下此刻的感悟</p>
-  </div>
-  <div class="diary-add" id="diaryAdd">
-    <input type="text" id="diaryTitle" placeholder="标题">
-    <input type="date" id="diaryDate">
-    <textarea id="diaryContent" placeholder="写下你的想法..."></textarea>
-    <button class="btn" onclick="addDiaryEntry()">发布随笔</button>
-  </div>
-  <div class="diary-list" id="diaryList"></div>
-</section>
+</div>
 
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
@@ -510,213 +451,422 @@ body {
   <img src="" alt="" id="lightboxImg">
 </div>
 
-<!-- Music Player -->
-<div class="music-player" id="musicPlayer">
-  <div class="music-select" id="musicSelect"></div>
-  <button class="music-btn" id="musicPlayBtn" onclick="toggleMusic()" title="播放/暂停">▶</button>
-  <div class="music-info">
-    <div class="track-name" id="trackName">未选择曲目</div>
-    <div class="track-artist" id="trackArtist">点击 - 选择配乐</div>
-  </div>
-  <button class="music-btn" onclick="nextTrack()" title="下一首">⏭</button>
-  <button class="music-btn" id="musicListBtn" onclick="toggleMusicList()" title="播放列表">☰</button>
-  <audio id="audioPlayer" style="display:none"></audio>
-  <input type="file" id="musicFileInput" accept="audio/*" style="display:none" onchange="addLocalMusic(this)">
+<!-- Music Mini Player -->
+<div class="music-mini" id="musicMini">
+  <button class="music-mini-btn" id="musicPlayBtn" onclick="toggleMusic()">▶</button>
+  <span class="music-mini-info" id="musicInfo" onclick="toggleSettings('music')">未选择配乐</span>
+  <input type="range" id="volumeSlider" min="0" max="100" value="30" style="width:60px;display:none;" oninput="setVolume(this.value)">
+  <audio id="audioPlayer" style="display:none" loop></audio>
 </div>
 
+<!-- Hidden Inputs -->
+<input type="file" id="uploadPhoto" accept="image/*" multiple style="display:none" onchange="addPhotos(this)">
+<input type="file" id="uploadBg" accept="image/*" style="display:none" onchange="changeBg(this)">
+<input type="file" id="uploadAudio" accept="audio/*" style="display:none" onchange="changeMusic(this)">
+<input type="file" id="uploadVideoInput" accept="video/*" style="display:none" onchange="addVideoFile(this)">
+
 <script>
-// ==================== DATA ====================
+// ==================== DATA MODEL ====================
+const STORAGE_KEY = 'myspace_data';
+
 const DEFAULTS = {
-  hero_name: '杨 振浩',
-  hero_tagline: '记录光影 · 珍藏时光',
-  hero_avatar: '',
-  about_bio: '这里是一段自我介绍。点击编辑按钮可以修改这段文字，写下你的故事、你的兴趣、你的一切。',
-  contact_email: 'example@email.com',
-  contact_loc: '中国',
-  contact_web: '个人网站',
-  tl_year_0: '2024', tl_desc_0: '开启新的旅程，学习前端开发',
-  tl_year_1: '2023', tl_desc_1: '完成大学学业，获得计算机科学学位',
-  tl_year_2: '2020', tl_desc_2: '第一次接触编程，被创造的魅力吸引',
-  gallery: [],
-  videos: [],
-  diary: [],
-  music_playlist: [
-    { name:'月光奏鸣曲', artist:'贝多芬', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-    { name:'宁静夜晚', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-    { name:'电子节拍', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-  ],
-  music_index: 0
+  siteTitle: 'MY SPACE',
+  bgImage: '',
+  musicUrl: '',
+  musicName: '',
+  media: [
+    { type:'image', src:'', width:1600, height:1200, leftAnno:'', rightAnno:'' },
+    { type:'image', src:'', width:1200, height:1600, leftAnno:'', rightAnno:'' },
+    { type:'image', src:'', width:1600, height:1067, leftAnno:'', rightAnno:'' },
+    { type:'image', src:'', width:1200, height:1600, leftAnno:'', rightAnno:'' },
+    { type:'image', src:'', width:1600, height:1200, leftAnno:'', rightAnno:'' },
+    { type:'video', src:'', width:1920, height:1080, leftAnno:'', rightAnno:'', poster:'' },
+  ]
 };
 
-let editMode = false;
-let currentMusicIndex = 0;
-
-function load(key) {
+function loadData() {
   try {
-    const raw = localStorage.getItem('diary_' + key);
+    const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch(e) { return null; }
 }
 
-function save(key, val) {
+function saveData(data) {
   try {
-    localStorage.setItem('diary_' + key, JSON.stringify(val));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch(e) {
-    if (e.name === 'QuotaExceededError') {
-      alert('存储空间不足！请删除一些照片或视频以释放空间。');
-    }
+    if (e.name === 'QuotaExceededError') alert('存储空间不足，请删除一些媒体文件');
   }
 }
 
-function getData(key, fallback) {
-  const v = load(key);
-  return v !== null && v !== undefined ? v : fallback;
+function getStore() {
+  let data = loadData();
+  if (!data) { data = JSON.parse(JSON.stringify(DEFAULTS)); saveData(data); }
+  // Ensure all fields exist
+  data.siteTitle = data.siteTitle ?? DEFAULTS.siteTitle;
+  data.bgImage = data.bgImage ?? DEFAULTS.bgImage;
+  data.musicUrl = data.musicUrl ?? DEFAULTS.musicUrl;
+  data.musicName = data.musicName ?? DEFAULTS.musicName;
+  data.media = data.media ?? DEFAULTS.media;
+  return data;
 }
+
+let editMode = false;
+let editingMediaIndex = -1;
+let settingsMode = '';
 
 // ==================== INIT ====================
-function initAll() {
-  // Hero
-  const heroName = getData('hero_name', DEFAULTS.hero_name);
-  const heroTagline = getData('hero_tagline', DEFAULTS.hero_tagline);
-  const heroAvatar = getData('hero_avatar', DEFAULTS.hero_avatar);
-  document.getElementById('heroName').textContent = heroName;
-  document.getElementById('heroTagline').textContent = heroTagline;
-  if (heroAvatar) document.getElementById('heroAvatar').src = heroAvatar;
-  else document.getElementById('heroAvatar').src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect fill="#e8e0d5" width="120" height="120"/><text x="60" y="68" text-anchor="middle" font-size="40" fill="#b8944b">?</text></svg>');
+function init() {
+  const store = getStore();
+  document.getElementById('siteTitle').textContent = store.siteTitle || 'MY SPACE';
+  applyBg(store.bgImage);
+  applyMusic(store.musicUrl, store.musicName);
+  renderMedia();
+  // Also make title editable in edit mode
+  updateSiteTitleState();
+}
 
-  // About
-  document.getElementById('aboutBio').textContent = getData('about_bio', DEFAULTS.about_bio);
-  ['contact_email','contact_loc','contact_web'].forEach(k => {
-    const el = document.querySelector('[data-key="'+k+'"]');
-    if (el) el.textContent = getData(k, DEFAULTS[k]);
+function applyBg(bgImage) {
+  const layer = document.getElementById('bgLayer');
+  if (bgImage) {
+    layer.classList.add('has-image');
+    layer.style.backgroundImage = 'url(' + bgImage + ')';
+  } else {
+    layer.classList.remove('has-image');
+    layer.style.backgroundImage = '';
+  }
+}
+
+function applyMusic(url, name) {
+  const audio = document.getElementById('audioPlayer');
+  const info = document.getElementById('musicInfo');
+  if (url) {
+    audio.src = url;
+    info.textContent = name || '自定义配乐';
+  } else {
+    audio.src = '';
+    info.textContent = '未选择配乐';
+  }
+}
+
+// ==================== RENDER MEDIA ====================
+function renderMedia() {
+  const store = getStore();
+  const grid = document.getElementById('mediaGrid');
+  const emptyHint = document.getElementById('emptyHint');
+  const media = store.media || [];
+
+  grid.innerHTML = '';
+
+  if (media.length === 0) {
+    emptyHint.style.display = 'block';
+    return;
+  }
+  emptyHint.style.display = 'none';
+
+  media.forEach((item, i) => {
+    const card = createMediaCard(item, i);
+    card.style.animationDelay = (i * 0.08) + 's';
+    grid.appendChild(card);
   });
-  for (let i=0;i<3;i++) {
-    ['year','desc'].forEach(f => {
-      const k = 'tl_'+f+'_'+i;
-      const el = document.querySelector('[data-key="'+k+'"]');
-      if (el) el.textContent = getData(k, DEFAULTS[k]);
+}
+
+function createMediaCard(item, index) {
+  const card = document.createElement('div');
+  card.className = 'media-card';
+  card.dataset.index = index;
+
+  const inner = document.createElement('div');
+  inner.className = 'media-card-inner';
+
+  if (item.type === 'video') {
+    // Left annotation
+    const leftAnno = createAnnotationEl('left', item.leftAnno);
+    inner.appendChild(leftAnno);
+
+    // Video element
+    const wrap = document.createElement('div');
+    wrap.className = 'video-wrap';
+    wrap.style.width = '320px';
+    wrap.style.height = '240px';
+
+    const video = document.createElement('video');
+    video.src = item.src || '';
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.style.width = '100%';
+    video.style.height = '100%';
+    if (item.poster) video.poster = item.poster;
+
+    const hint = document.createElement('div');
+    hint.className = 'play-hint';
+
+    wrap.appendChild(video);
+    wrap.appendChild(hint);
+
+    // Hover play/pause
+    wrap.addEventListener('mouseenter', () => {
+      video.play().catch(() => {});
+      wrap.classList.add('playing');
     });
+    wrap.addEventListener('mouseleave', () => {
+      video.pause();
+      video.currentTime = 0;
+      wrap.classList.remove('playing');
+    });
+
+    // Click in non-edit mode opens lightbox-ish view (fullscreen video)
+    wrap.addEventListener('click', (e) => {
+      if (editMode) { openEditOverlay(index); return; }
+      if (video.paused) {
+        video.play().catch(() => {});
+        wrap.classList.add('playing');
+      } else {
+        video.pause();
+        wrap.classList.remove('playing');
+      }
+    });
+
+    inner.appendChild(wrap);
+
+    // Right annotation
+    const rightAnno = createAnnotationEl('right', item.rightAnno);
+    inner.appendChild(rightAnno);
+  } else {
+    // Image type
+    const leftAnno = createAnnotationEl('left', item.leftAnno);
+    inner.appendChild(leftAnno);
+
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'media-img-wrap';
+
+    // Calculate display height based on aspect ratio
+    const ratio = item.width && item.height ? item.width / item.height : 4/3;
+    const displayH = 280;
+    const displayW = Math.round(displayH * ratio);
+    imgWrap.style.height = displayH + 'px';
+    imgWrap.style.width = displayW + 'px';
+
+    const img = document.createElement('img');
+    img.src = item.src || placeholderImg(item.width, item.height);
+    img.alt = 'Photo ' + (index + 1);
+    img.loading = 'lazy';
+    imgWrap.appendChild(img);
+
+    // Click behavior
+    imgWrap.addEventListener('click', (e) => {
+      if (editMode) { e.stopPropagation(); openEditOverlay(index); return; }
+      openLightbox(item.src || placeholderImg(item.width, item.height));
+    });
+
+    inner.appendChild(imgWrap);
+
+    const rightAnno = createAnnotationEl('right', item.rightAnno);
+    inner.appendChild(rightAnno);
   }
 
-  // Gallery
-  renderGallery();
+  card.appendChild(inner);
+  return card;
+}
 
-  // Videos
-  renderVideos();
+function createAnnotationEl(side, text) {
+  const div = document.createElement('div');
+  div.className = 'annotation annotation-' + side;
+  const inner = document.createElement('div');
+  inner.className = 'annotation-inner';
+  inner.textContent = text || '';
+  div.appendChild(inner);
+  return div;
+}
 
-  // Diary
-  renderDiary();
-  document.getElementById('diaryDate').value = new Date().toISOString().split('T')[0];
-
-  // Music
-  initMusic();
-
-  // Scroll animation
-  observeFadeIn();
+function placeholderImg(w, h) {
+  // Generate a beautiful gradient placeholder
+  const ratio = (w && h) ? w/h : 4/3;
+  const ph = 280; const pw = Math.round(ph * ratio);
+  const hue = Math.floor(Math.random() * 60) + 200; // blue-ish tones
+  return 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="'+pw+'" height="'+ph+'">' +
+    '<rect fill="#2a2a2e" width="'+pw+'" height="'+ph+'"/>' +
+    '<text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#555" font-size="18" font-family="sans-serif">点击上传照片</text>' +
+    '</svg>'
+  );
 }
 
 // ==================== EDIT MODE ====================
 function toggleEditMode() {
   editMode = !editMode;
-  const toggle = document.getElementById('editToggle');
-  const hint = document.getElementById('editHint');
-
-  if (editMode) {
-    toggle.classList.add('active');
-    hint.style.display = 'block';
-  } else {
-    toggle.classList.remove('active');
-    hint.style.display = 'none';
-  }
-
+  const btn = document.getElementById('editToggle');
   document.body.classList.toggle('edit-mode', editMode);
-
-  // Toggle contenteditable
-  document.querySelectorAll('[contenteditable]').forEach(el => {
-    el.contentEditable = editMode;
-  });
-
-  // Re-render gallery & videos to show/hide buttons
-  renderGallery();
-  renderVideos();
-  renderDiary();
+  if (editMode) {
+    btn.classList.add('active');
+  } else {
+    btn.classList.remove('active');
+  }
+  updateSiteTitleState();
+  renderMedia(); // re-render to update click behaviors
 }
 
-// Auto-save on contenteditable change
-document.addEventListener('input', function(e) {
+function updateSiteTitleState() {
+  const title = document.getElementById('siteTitle');
+  title.contentEditable = editMode;
+  if (editMode) {
+    title.style.outline = '1px dashed rgba(201,169,110,.3)';
+    title.style.borderRadius = '4px';
+    title.style.padding = '2px 8px';
+  } else {
+    title.style.outline = '';
+    title.style.borderRadius = '';
+    title.style.padding = '';
+  }
+}
+
+// Save title on input
+document.getElementById('siteTitle').addEventListener('input', function() {
   if (!editMode) return;
-  const el = e.target.closest('[data-key]');
-  if (!el) return;
-  if (el.closest('.diary-card')) return; // diary has its own save logic
-  const key = el.dataset.key;
-  save(key, el.textContent);
+  const store = getStore();
+  store.siteTitle = this.textContent;
+  saveData(store);
 });
 
-// ==================== HERO AVATAR ====================
-function changeAvatar(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const base64 = e.target.result;
-    document.getElementById('heroAvatar').src = base64;
-    save('hero_avatar', base64);
+// ==================== ANNOTATION EDITING ====================
+function openEditOverlay(index) {
+  editingMediaIndex = index;
+  const store = getStore();
+  const item = store.media[index];
+  document.getElementById('editLeftAnno').value = item.leftAnno || '';
+  document.getElementById('editRightAnno').value = item.rightAnno || '';
+  document.getElementById('editOverlay').classList.add('open');
+  document.getElementById('editDeleteBtn').onclick = function() {
+    deleteMedia(index);
+    closeEditOverlay();
   };
-  reader.readAsDataURL(file);
 }
 
-// ==================== GALLERY ====================
-function renderGallery() {
-  const grid = document.getElementById('galleryGrid');
-  const photos = getData('gallery', DEFAULTS.gallery);
-  grid.innerHTML = '';
-
-  photos.forEach((photo, i) => {
-    const card = document.createElement('div');
-    card.className = 'gallery-card';
-    card.innerHTML = `
-      <button class="del-btn" onclick="event.stopPropagation();deletePhoto(${i})">×</button>
-      <img src="${photo}" alt="照片 ${i+1}" onclick="openLightbox('${photo}')" loading="lazy">
-    `;
-    grid.appendChild(card);
-  });
-
-  const upload = document.createElement('div');
-  upload.className = 'gallery-upload';
-  upload.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>添加照片</span>';
-  upload.onclick = function() { if(editMode) document.getElementById('photoInput').click(); };
-  grid.appendChild(upload);
+function closeEditOverlay() {
+  document.getElementById('editOverlay').classList.remove('open');
+  editingMediaIndex = -1;
 }
 
+function saveAnnotation() {
+  if (editingMediaIndex < 0) return;
+  const store = getStore();
+  store.media[editingMediaIndex].leftAnno = document.getElementById('editLeftAnno').value;
+  store.media[editingMediaIndex].rightAnno = document.getElementById('editRightAnno').value;
+  saveData(store);
+  renderMedia();
+  closeEditOverlay();
+}
+
+function deleteMedia(index) {
+  if (!confirm('确定删除这个媒体吗？')) return;
+  const store = getStore();
+  store.media.splice(index, 1);
+  saveData(store);
+  renderMedia();
+}
+
+// ==================== ADD PHOTOS ====================
 function addPhotos(input) {
   const files = Array.from(input.files);
   if (!files.length) return;
 
-  let count = 0;
+  const store = getStore();
+  let processed = 0;
+
   files.forEach(file => {
-    if (file.size > 5 * 1024 * 1024) { alert(file.name + ' 超过 5MB 限制，已跳过'); return; }
+    if (!file.type.startsWith('image/')) { processed++; return; }
+    if (file.size > 8 * 1024 * 1024) { alert(file.name + ' 超过 8MB，已跳过'); processed++; return; }
+
     const reader = new FileReader();
     reader.onload = function(e) {
-      const photos = getData('gallery', []);
-      photos.push(e.target.result);
-      save('gallery', photos);
-      count++;
-      if (count === files.filter(f => f.size <= 5*1024*1024).length) renderGallery();
+      // Get image dimensions
+      const img = new Image();
+      img.onload = function() {
+        store.media.push({
+          type: 'image',
+          src: e.target.result,
+          width: img.width,
+          height: img.height,
+          leftAnno: '',
+          rightAnno: ''
+        });
+        processed++;
+        if (processed === files.length) {
+          saveData(store);
+          renderMedia();
+        }
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   });
+
   input.value = '';
 }
 
-function deletePhoto(index) {
-  if (!editMode) return;
-  if (!confirm('确定删除这张照片吗？')) return;
-  const photos = getData('gallery', []);
-  photos.splice(index, 1);
-  save('gallery', photos);
-  renderGallery();
+// ==================== ADD VIDEO ====================
+function addVideoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (file.size > 30 * 1024 * 1024) { alert('视频超过 30MB，建议使用较小的文件'); return; }
+
+  const store = getStore();
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    // Generate a poster from video first frame
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+
+    const blobUrl = URL.createObjectURL(file);
+    video.src = blobUrl;
+
+    video.onloadeddata = function() {
+      // Try to capture poster frame
+      video.currentTime = 1;
+    };
+
+    video.onseeked = function() {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+        const poster = canvas.toDataURL('image/jpeg', 0.7);
+
+        store.media.push({
+          type: 'video',
+          src: e.target.result,
+          width: video.videoWidth,
+          height: video.videoHeight,
+          leftAnno: '',
+          rightAnno: '',
+          poster: poster
+        });
+      } catch(err) {
+        store.media.push({
+          type: 'video',
+          src: e.target.result,
+          width: 1920,
+          height: 1080,
+          leftAnno: '',
+          rightAnno: '',
+          poster: ''
+        });
+      }
+      URL.revokeObjectURL(blobUrl);
+      saveData(store);
+      renderMedia();
+    };
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
 }
 
+// ==================== LIGHTBOX ====================
 function openLightbox(src) {
   if (editMode) return;
   document.getElementById('lightboxImg').src = src;
@@ -729,242 +879,188 @@ function closeLightbox() {
   document.body.style.overflow = '';
 }
 
-// ==================== VIDEO ====================
-function renderVideos() {
-  const grid = document.getElementById('videoGrid');
-  const videos = getData('videos', DEFAULTS.videos);
-  grid.innerHTML = '';
-
-  videos.forEach((v, i) => {
-    const card = document.createElement('div');
-    card.className = 'video-card';
-    card.innerHTML = `
-      <button class="del-btn" onclick="deleteVideo(${i})">×</button>
-      <div class="video-wrapper">
-        <iframe src="${escapeHtml(v.url)}" allowfullscreen loading="lazy"></iframe>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-function addVideo() {
-  const input = document.getElementById('videoUrlInput');
-  const url = input.value.trim();
-  if (!url) { alert('请输入视频嵌入链接'); return; }
-  const videos = getData('videos', []);
-  videos.push({ url });
-  save('videos', videos);
-  input.value = '';
-  renderVideos();
-}
-
-function deleteVideo(index) {
-  if (!editMode) return;
-  if (!confirm('确定删除这个视频吗？')) return;
-  const videos = getData('videos', []);
-  videos.splice(index, 1);
-  save('videos', videos);
-  renderVideos();
-}
-
-// ==================== DIARY ====================
-function renderDiary() {
-  const list = document.getElementById('diaryList');
-  const entries = getData('diary', DEFAULTS.diary);
-  // Sort by date descending
-  entries.sort((a,b) => new Date(b.date) - new Date(a.date));
-  list.innerHTML = '';
-
-  if (entries.length === 0) {
-    list.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:3rem;">还没有随笔，开启编辑模式写下第一条吧 ✍️</div>';
+// ==================== SETTINGS PANEL ====================
+function toggleSettings(mode) {
+  if (settingsMode === mode && document.getElementById('settingsPanel').classList.contains('open')) {
+    closeSettings();
     return;
   }
+  settingsMode = mode;
+  const panel = document.getElementById('settingsPanel');
+  const overlay = document.getElementById('settingsOverlay');
+  const title = document.getElementById('settingsTitle');
+  const content = document.getElementById('settingsContent');
+  const store = getStore();
 
-  entries.forEach((entry, i) => {
-    const card = document.createElement('div');
-    card.className = 'diary-card';
-    card.innerHTML = `
-      <button class="del-btn" onclick="deleteDiaryEntry(${i})">×</button>
-      <div class="date">${escapeHtml(entry.date)}</div>
-      <h3 contenteditable="${editMode}" data-key="diary_title_${i}" data-idx="${i}">${escapeHtml(entry.title)}</h3>
-      <div class="content" contenteditable="${editMode}" data-key="diary_content_${i}" data-idx="${i}">${escapeHtml(entry.content)}</div>
+  if (mode === 'bg') {
+    title.textContent = '更换背景';
+    content.innerHTML = `
+      <div class="settings-group">
+        <label>上传背景图片</label>
+        <div class="settings-upload" onclick="document.getElementById('uploadBg').click()">
+          <span>📁</span> 选择图片文件
+        </div>
+      </div>
+      <div class="settings-group">
+        <label>或输入图片URL</label>
+        <input type="text" id="bgUrlInput" placeholder="https://..." value="${store.bgImage && !store.bgImage.startsWith('data:') ? store.bgImage : ''}">
+        <button class="btn btn-primary" style="margin-top:.8rem;width:100%;" onclick="applyBgUrl()">应用背景</button>
+      </div>
+      ${store.bgImage ? `<button class="btn btn-secondary" style="width:100%;margin-top:.5rem;" onclick="removeBg()">移除背景</button>` : ''}
     `;
-    list.appendChild(card);
-  });
-
-  // Re-bind input event for diary inline editing
-  document.querySelectorAll('.diary-card [data-key]').forEach(el => {
-    el.addEventListener('input', function() {
-      if (!editMode) return;
-      const idx = parseInt(this.dataset.idx);
-      const entries = getData('diary', []);
-      if (entries[idx]) {
-        if (this.dataset.key.startsWith('diary_title_')) entries[idx].title = this.textContent;
-        else entries[idx].content = this.textContent;
-        save('diary', entries);
-      }
-    });
-  });
-}
-
-function addDiaryEntry() {
-  const title = document.getElementById('diaryTitle').value.trim();
-  const date = document.getElementById('diaryDate').value;
-  const content = document.getElementById('diaryContent').value.trim();
-  if (!title || !content) { alert('请填写标题和内容'); return; }
-
-  const entries = getData('diary', []);
-  entries.push({ title, date, content });
-  save('diary', entries);
-
-  document.getElementById('diaryTitle').value = '';
-  document.getElementById('diaryContent').value = '';
-  document.getElementById('diaryDate').value = new Date().toISOString().split('T')[0];
-  renderDiary();
-}
-
-function deleteDiaryEntry(index) {
-  if (!editMode) return;
-  if (!confirm('确定删除这篇随笔吗？')) return;
-  const entries = getData('diary', []);
-  entries.splice(index, 1);
-  save('diary', entries);
-  renderDiary();
-}
-
-// ==================== MUSIC ====================
-function initMusic() {
-  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
-  currentMusicIndex = getData('music_index', 0);
-  const audio = document.getElementById('audioPlayer');
-  const select = document.getElementById('musicSelect');
-
-  select.innerHTML = '';
-  playlist.forEach((track, i) => {
-    const opt = document.createElement('div');
-    opt.className = 'track-option' + (i === currentMusicIndex ? ' active' : '');
-    opt.innerHTML = `<span>${escapeHtml(track.name)} <small style="color:var(--text-light)">${escapeHtml(track.artist)}</small></span>`;
-    opt.onclick = function(e) { e.stopPropagation(); playTrack(i); };
-    select.appendChild(opt);
-  });
-
-  // Add local music option
-  const addOpt = document.createElement('div');
-  addOpt.className = 'track-option';
-  addOpt.innerHTML = '<span style="color:var(--accent)">+ 添加本地音乐</span>';
-  addOpt.onclick = function(e) { e.stopPropagation(); document.getElementById('musicFileInput').click(); };
-  select.appendChild(addOpt);
-
-  if (playlist.length > 0 && playlist[currentMusicIndex] && playlist[currentMusicIndex].url) {
-    audio.src = playlist[currentMusicIndex].url;
-    updateMusicInfo(currentMusicIndex);
+  } else if (mode === 'music') {
+    title.textContent = '更换配乐';
+    content.innerHTML = `
+      <div class="settings-group">
+        <label>上传音频文件</label>
+        <div class="settings-upload" onclick="document.getElementById('uploadAudio').click()">
+          <span>📁</span> 选择音频 (MP3/WAV)
+        </div>
+        ${store.musicName ? `<p style="font-size:.8rem;color:var(--gold);margin-top:.5rem;">当前: ${store.musicName}</p>` : ''}
+      </div>
+      <div class="settings-group">
+        <label>或输入音频URL</label>
+        <input type="text" id="musicUrlInput" placeholder="https://..." value="${store.musicUrl && !store.musicUrl.startsWith('data:') ? store.musicUrl : ''}">
+        <input type="text" id="musicNameInput" placeholder="曲目名称" value="${store.musicName && !store.musicUrl.startsWith('data:') ? store.musicName : ''}" style="margin-top:.5rem;">
+        <button class="btn btn-primary" style="margin-top:.8rem;width:100%;" onclick="applyMusicUrl()">应用配乐</button>
+      </div>
+      ${store.musicUrl ? `<button class="btn btn-secondary" style="width:100%;margin-top:.5rem;" onclick="removeMusic()">移除配乐</button>` : ''}
+    `;
   }
+
+  panel.classList.add('open');
+  overlay.classList.add('open');
 }
 
-function playTrack(index) {
-  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
-  if (index < 0 || index >= playlist.length) return;
-  currentMusicIndex = index;
-  save('music_index', index);
-  const audio = document.getElementById('audioPlayer');
-  audio.src = playlist[index].url;
-  audio.play().catch(() => {});
-  updateMusicInfo(index);
-  document.getElementById('musicPlayBtn').classList.add('playing');
-  document.getElementById('musicPlayBtn').textContent = '⏸';
-  document.getElementById('musicSelect').classList.remove('open');
-  initMusic(); // refresh select
+function closeSettings() {
+  document.getElementById('settingsPanel').classList.remove('open');
+  document.getElementById('settingsOverlay').classList.remove('open');
+  settingsMode = '';
 }
 
+function applyBgUrl() {
+  const url = document.getElementById('bgUrlInput').value.trim();
+  if (!url) return;
+  const store = getStore();
+  store.bgImage = url;
+  saveData(store);
+  applyBg(url);
+  closeSettings();
+}
+
+function removeBg() {
+  const store = getStore();
+  store.bgImage = '';
+  saveData(store);
+  applyBg('');
+  closeSettings();
+}
+
+function applyMusicUrl() {
+  const url = document.getElementById('musicUrlInput').value.trim();
+  const name = document.getElementById('musicNameInput').value.trim() || '自定义配乐';
+  if (!url) return;
+  const store = getStore();
+  store.musicUrl = url;
+  store.musicName = name;
+  saveData(store);
+  applyMusic(url, name);
+  closeSettings();
+}
+
+function removeMusic() {
+  const store = getStore();
+  store.musicUrl = '';
+  store.musicName = '';
+  saveData(store);
+  applyMusic('', '');
+  document.getElementById('audioPlayer').pause();
+  document.getElementById('musicPlayBtn').textContent = '▶';
+  closeSettings();
+}
+
+function changeBg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('背景图片不能超过 5MB'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const store = getStore();
+    store.bgImage = e.target.result;
+    saveData(store);
+    applyBg(e.target.result);
+    closeSettings();
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function changeMusic(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { alert('音频文件不能超过 10MB'); input.value = ''; return; }
+  const url = URL.createObjectURL(file);
+  const name = file.name.replace(/\.[^.]+$/, '');
+  const store = getStore();
+
+  // Read as base64 for persistence
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    URL.revokeObjectURL(url);
+    store.musicUrl = e.target.result;
+    store.musicName = name;
+    saveData(store);
+    applyMusic(e.target.result, name);
+    closeSettings();
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+// ==================== MUSIC PLAYER ====================
 function toggleMusic() {
   const audio = document.getElementById('audioPlayer');
   const btn = document.getElementById('musicPlayBtn');
+  if (!audio.src) { toggleSettings('music'); return; }
   if (audio.paused) {
     audio.play().catch(() => {});
-    btn.classList.add('playing');
     btn.textContent = '⏸';
   } else {
     audio.pause();
-    btn.classList.remove('playing');
     btn.textContent = '▶';
   }
 }
 
-function nextTrack() {
-  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
-  if (playlist.length === 0) return;
-  const next = (currentMusicIndex + 1) % playlist.length;
-  playTrack(next);
+function setVolume(val) {
+  document.getElementById('audioPlayer').volume = val / 100;
 }
 
-function toggleMusicList() {
-  document.getElementById('musicSelect').classList.toggle('open');
-}
-
-function updateMusicInfo(index) {
-  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
-  if (playlist[index]) {
-    document.getElementById('trackName').textContent = playlist[index].name;
-    document.getElementById('trackArtist').textContent = playlist[index].artist;
-  }
-}
-
-function addLocalMusic(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
-  playlist.push({ name: file.name.replace(/\.[^.]+$/, ''), artist: '本地音乐', url, _local: true });
-  save('music_playlist', playlist);
-  initMusic();
-  playTrack(playlist.length - 1);
-  input.value = '';
-}
-
-// Handle audio events
-document.getElementById('audioPlayer').addEventListener('ended', nextTrack);
+// Audio events
 document.getElementById('audioPlayer').addEventListener('play', function() {
-  document.getElementById('musicPlayBtn').classList.add('playing');
   document.getElementById('musicPlayBtn').textContent = '⏸';
 });
 document.getElementById('audioPlayer').addEventListener('pause', function() {
-  document.getElementById('musicPlayBtn').classList.remove('playing');
   document.getElementById('musicPlayBtn').textContent = '▶';
 });
 
-// Close music list on outside click
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('#musicPlayer')) {
-    document.getElementById('musicSelect').classList.remove('open');
+// Volume slider toggle on music info click (hold or right-click)
+document.getElementById('musicInfo').addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  const slider = document.getElementById('volumeSlider');
+  slider.style.display = slider.style.display === 'none' ? 'block' : 'none';
+});
+
+// ==================== KEYBOARD ====================
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeLightbox();
+    closeEditOverlay();
+    closeSettings();
   }
 });
 
-// ==================== UTILS ====================
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-// ==================== SCROLL ANIMATION ====================
-function observeFadeIn() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.15 });
-
-  document.querySelectorAll('.section, .hero-content').forEach(el => {
-    el.classList.add('fade-in');
-    observer.observe(el);
-  });
-}
-
 // ==================== BOOTSTRAP ====================
-initAll();
+init();
 </script>
 </body>
 </html>
