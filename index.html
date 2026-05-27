@@ -6,22 +6,39 @@
 <title>My Space</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
+/* ============================================
+   COLOR FORMULA (60-30-10)
+   60% — warm neutrals (background, spacing)
+   30% — images/media (the visual star)
+   10% — muted gold accent (lines, highlights)
+   ============================================ */
 :root {
-  --bg: #1a1a1c;
-  --surface: #242427;
-  --text: #d4cfc7;
-  --text-dim: #999590;
-  --gold: #c9a96e;
-  --gold-light: #dcc89b;
-  --gold-dim: #8a7348;
-  --radius: 6px;
-  --transition: 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --bg:        #f7f4ef;
+  --bg-warm:   #f2ede5;
+  --surface:   #fefdfb;
+  --text:      #2c2416;
+  --text-soft: #8a8478;
+  --text-dim:  #b8b2a6;
+  --gold:      #b8944b;
+  --gold-lit:  #d4bc8b;
+  --line:      #e4ded4;
+  --line-lit:  #ede8df;
+  --shadow:    0 2px 16px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 24px rgba(0,0,0,.07);
+  --radius:    4px;
+  --ease:      cubic-bezier(0.33, 0.66, 0.66, 1);
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; font-size:16px; background:var(--bg); }
+
+html {
+  scroll-behavior:smooth;
+  font-size:16px;
+  background:var(--bg);
+}
 
 body {
   font-family: 'Noto Serif SC', 'Cormorant Garamond', Georgia, serif;
@@ -29,397 +46,399 @@ body {
   color: var(--text);
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-  transition: background .6s;
+  transition: background .5s;
 }
 
-/* ===== Background Layer ===== */
-.bg-layer {
-  position: fixed; inset: 0; z-index: 0;
-  background: var(--bg);
-  transition: opacity .8s;
+/* ===== Background Overlay ===== */
+.bg-overlay {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0; transition: opacity .8s;
 }
-.bg-layer.has-image {
-  background-size: cover;
-  background-position: center;
+.bg-overlay.active {
+  opacity: 1;
+  background-size: cover; background-position: center;
   background-repeat: no-repeat;
 }
-.bg-layer::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,.55);
+.bg-overlay::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(247,244,239,.82);
 }
 
 /* ===== Top Bar ===== */
-.top-bar {
+.topbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.2rem 2rem;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 2rem;
-  background: linear-gradient(to bottom, rgba(26,26,28,.9), transparent);
-  pointer-events: none;
+  mix-blend-mode: normal;
+  background: linear-gradient(to bottom, rgba(247,244,239,.95) 60%, rgba(247,244,239,0));
 }
-.top-bar > * { pointer-events: auto; }
-.site-title {
+.topbar-left {
   font-family: 'Cormorant Garamond', 'Playfair Display', serif;
-  font-size: 1.1rem; font-weight: 300; letter-spacing: 3px;
-  color: var(--text-dim); text-transform: uppercase;
+  font-size: 1rem; font-weight: 400; letter-spacing: 4px;
+  color: var(--text-soft); text-transform: uppercase;
 }
-.top-actions {
-  display: flex; gap: .5rem; align-items: center;
+.topbar-right { display: flex; gap: 2px; }
+.tb-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: none; background: transparent;
+  color: var(--text-soft); cursor: pointer;
+  font-size: .85rem; display: flex; align-items: center; justify-content: center;
+  transition: all .3s; position: relative;
 }
-.icon-btn {
-  width: 36px; height: 36px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.3); color: var(--text-dim);
-  cursor: pointer; font-size: .95rem;
-  display: flex; align-items: center; justify-content: center;
-  transition: var(--transition);
-  backdrop-filter: blur(8px);
-  position: relative;
-}
-.icon-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(0,0,0,.5); }
-.icon-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,.15); }
-.icon-btn .tooltip {
-  display: none; position: absolute; top: 110%; right: 0;
-  white-space: nowrap; font-size: .75rem; color: var(--text-dim);
-  background: rgba(0,0,0,.8); padding: .3rem .7rem; border-radius: 4px;
-  pointer-events: none;
-}
-.icon-btn:hover .tooltip { display: block; }
+.tb-btn:hover { color: var(--gold); background: rgba(184,148,75,.08); }
+.tb-btn.active { color: var(--gold); background: rgba(184,148,75,.12); }
 
-/* ===== Main Media Stage ===== */
-.media-stage {
+/* ===== Main Stream ===== */
+.main-stream {
   position: relative; z-index: 1;
-  max-width: 1400px; margin: 0 auto;
-  padding: 5rem 1.5rem 3rem;
-  min-height: 100vh;
-}
-.media-grid {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  align-items: flex-start; gap: .8rem;
-  padding: 2rem 0;
+  max-width: 900px; margin: 0 auto;
+  padding: 6rem 2rem 4rem;
+  display: flex; flex-direction: column;
+  gap: 7rem;
 }
 
-/* ===== Media Card ===== */
-.media-card {
+/* ===== Media Item ===== */
+.media-item {
   position: relative;
-  display: flex; align-items: center;
-  flex-shrink: 0;
-  transition: transform var(--transition), z-index 0s;
-  z-index: 1;
-  cursor: default;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 200px;
+  animation: reveal .9s var(--ease-out) both;
 }
-.media-card:hover { z-index: 20; }
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-.media-card-inner {
+.media-stage {
   position: relative;
-  display: flex; align-items: center;
-  border-radius: var(--radius);
-  overflow: visible;
-  transition: transform var(--transition), box-shadow var(--transition);
-  background: var(--surface);
-}
-.media-card:hover .media-card-inner {
-  transform: scale(1.18);
-  box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .5s var(--ease-out), filter .5s var(--ease-out);
 }
 
-/* Image wrapper */
-.media-img-wrap {
-  position: relative; overflow: hidden;
-  border-radius: var(--radius);
-  flex-shrink: 0;
+/* ===== Image ===== */
+.media-img {
+  display: block;
+  max-width: 100%;
+  max-height: 75vh;
+  width: auto; height: auto;
+  object-fit: contain;
+  border-radius: 2px;
+  box-shadow: var(--shadow);
+  transition: transform .5s var(--ease-out), box-shadow .5s var(--ease-out);
+  cursor: zoom-in;
 }
-.media-img-wrap img {
-  display: block; height: 100%; width: auto;
-  object-fit: cover; border-radius: var(--radius);
-  transition: transform .6s cubic-bezier(.25,.46,.45,.94);
+.media-item:hover .media-img {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-md);
 }
-.media-card:hover .media-img-wrap img {
+.media-item:hover .media-stage {
   transform: scale(1.03);
 }
 
-/* ===== Annotations ===== */
-.annotation {
-  flex-shrink: 0;
-  width: 0;
-  opacity: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  transition: width var(--transition), opacity var(--transition), padding var(--transition);
-  color: var(--gold-light);
-  font-size: .9rem;
-  writing-mode: horizontal-tb;
-  max-width: 180px;
+/* ===== Video ===== */
+.media-video-wrap {
+  position: relative; cursor: pointer;
+  max-width: 100%; width: 100%;
+  border-radius: 2px; overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform .5s var(--ease-out), box-shadow .5s var(--ease-out);
+  background: #000;
 }
-.annotation-inner {
-  padding: 0 1.2rem;
-  font-family: 'Noto Serif SC', serif;
-  font-weight: 300; letter-spacing: 1px;
-  line-height: 1.6;
-  font-style: italic;
-  color: var(--gold-light);
-  text-shadow: 0 1px 4px rgba(0,0,0,.5);
-  white-space: normal;
-  word-break: break-word;
+.media-item:hover .media-video-wrap {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-md);
 }
-.annotation-left { text-align: right; }
-.annotation-right { text-align: left; }
-
-.media-card:hover .annotation {
-  width: 180px; opacity: 1;
+.media-video-wrap video {
+  display: block; width: 100%; max-height: 75vh;
+  object-fit: contain; background: #111;
 }
-.media-card:hover .annotation-left { padding-right: 0; }
-.media-card:hover .annotation-right { padding-left: 0; }
-.media-card:hover .annotation-inner { padding: 0 1.2rem; }
-
-/* Dim other cards when one is hovered */
-.media-grid:hover .media-card:not(:hover) .media-card-inner {
-  transform: scale(0.92);
-  filter: brightness(.55) blur(1px);
-}
-
-/* ===== Video Card ===== */
-.video-wrap {
-  position: relative; border-radius: var(--radius); overflow: hidden;
-  cursor: pointer; background: #000;
-}
-.video-wrap video {
-  display: block; border-radius: var(--radius);
-  object-fit: cover;
-}
-.video-wrap .play-hint {
+.media-video-wrap .play-badge {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,.35);
-  transition: opacity .3s;
-  pointer-events: none;
+  pointer-events: none; transition: opacity .4s;
 }
-.video-wrap .play-hint::after {
-  content: '▶'; font-size: 2.5rem; color: rgba(255,255,255,.8);
-  text-shadow: 0 2px 8px rgba(0,0,0,.5);
-  transition: transform .3s;
+.media-video-wrap .play-badge::after {
+  content: ''; width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(255,255,255,.85);
+  box-shadow: 0 4px 20px rgba(0,0,0,.12);
+  position: relative;
 }
-.video-wrap:hover .play-hint { opacity: 0; }
-.video-wrap.playing .play-hint { opacity: 0; }
+.media-video-wrap .play-badge::before {
+  content: ''; position: absolute; z-index: 1;
+  width: 0; height: 0;
+  border-left: 18px solid #2c2416;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  margin-left: 4px;
+}
+.media-video-wrap.playing .play-badge { opacity: 0; }
+
+/* ===== Annotation ===== */
+.anno {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  max-width: 160px; opacity: 0;
+  transition: opacity .4s var(--ease-out), transform .4s var(--ease-out);
+  pointer-events: none; z-index: 5;
+}
+.anno.anno-left  { right: calc(100% + 2rem); text-align: right;  transform: translateY(-50%) translateX(-8px); }
+.anno.anno-right { left:  calc(100% + 2rem); text-align: left;   transform: translateY(-50%) translateX(8px); }
+.media-item:hover .anno { opacity: 1; transform: translateY(-50%) translateX(0); pointer-events: auto; }
+.anno-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: .9rem; font-weight: 300; line-height: 1.8;
+  color: var(--text-soft); letter-spacing: .5px;
+  font-style: italic;
+}
+.anno-line {
+  display: inline-block; width: 20px; height: 1px;
+  background: var(--gold); vertical-align: middle;
+  margin: 0 .6rem; opacity: .6;
+}
 
 /* ===== Edit Mode ===== */
-.edit-mode .media-card { cursor: pointer; }
-.edit-mode .media-card:hover .media-card-inner {
-  transform: scale(1.08);
-  box-shadow: 0 0 0 2px var(--gold), 0 12px 40px rgba(0,0,0,.5);
+.edit-mode .media-img { cursor: pointer; }
+.edit-mode .media-item:hover .media-img {
+  transform: scale(1.03); box-shadow: 0 0 0 2px var(--gold), var(--shadow-md);
 }
-.edit-mode .media-grid:hover .media-card:not(:hover) .media-card-inner {
-  transform: scale(0.95); filter: brightness(.7);
-}
-.edit-mode .annotation { width: 140px !important; opacity: .7 !important; }
-.edit-mode .annotation-inner {
-  outline: 1px dashed rgba(201,169,110,.3);
-  border-radius: 4px; padding: .5rem .8rem !important;
+.edit-mode .media-item:hover .media-stage { transform: scale(1.03); }
+.edit-mode .anno { opacity: .8 !important; }
+.edit-mode .anno-text {
+  outline: 1px dashed rgba(184,148,75,.25);
+  padding: .4rem .6rem; border-radius: 3px;
   font-style: normal; font-size: .8rem; cursor: text;
+  pointer-events: auto;
 }
-.edit-mode .annotation-inner:focus {
-  outline: 1px solid var(--gold);
-  color: #fff;
-}
+.edit-mode .anno-text:focus { outline: 1px solid var(--gold); }
 
-/* ===== Add Media Buttons (edit mode) ===== */
-.add-media-bar {
+.edit-mode .media-delete {
+  display: block;
+  position: absolute; top: -2rem; right: 0;
+  background: none; border: none; color: #c44;
+  cursor: pointer; font-size: .8rem; opacity: 0;
+  transition: opacity .3s;
+}
+.edit-mode .media-item:hover .media-delete { opacity: 1; }
+.media-delete { display: none; }
+
+/* ===== Add Bar ===== */
+.add-bar {
   display: none; position: fixed; bottom: 2rem; left: 50%;
-  transform: translateX(-50%); z-index: 50;
-  gap: 1rem;
+  transform: translateX(-50%); z-index: 50; gap: 1rem;
 }
-.edit-mode .add-media-bar { display: flex; }
-.add-media-btn {
-  padding: .7rem 1.5rem; border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.2);
-  background: rgba(0,0,0,.6); color: var(--gold);
+.edit-mode .add-bar { display: flex; }
+.add-btn {
+  padding: .6rem 1.4rem; border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface); color: var(--text-soft);
   cursor: pointer; font-family: inherit; font-size: .85rem;
-  letter-spacing: 1px; backdrop-filter: blur(8px);
-  transition: var(--transition);
+  letter-spacing: 1px; box-shadow: var(--shadow);
+  transition: all .3s;
 }
-.add-media-btn:hover { border-color: var(--gold); background: rgba(201,169,110,.15); }
+.add-btn:hover { border-color: var(--gold); color: var(--gold); box-shadow: var(--shadow-md); }
 
-/* ===== Media Edit Overlay (edit mode on click) ===== */
+/* ===== Edit Overlay ===== */
 .edit-overlay {
-  display: none; position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,.85); align-items: center; justify-content: center;
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(44,36,22,.4); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
 }
 .edit-overlay.open { display: flex; }
-.edit-overlay-content {
+.edit-card {
   background: var(--surface); border-radius: 12px;
-  padding: 2rem; max-width: 500px; width: 90%;
-  border: 1px solid rgba(255,255,255,.1);
+  padding: 2.5rem; max-width: 460px; width: 92%;
+  box-shadow: 0 20px 60px rgba(0,0,0,.15);
 }
-.edit-overlay-content h3 { font-weight: 400; margin-bottom: 1.5rem; color: var(--gold); }
-.edit-overlay-content input, .edit-overlay-content textarea {
-  width: 100%; padding: .8rem 1rem; margin-bottom: 1rem;
-  background: var(--bg); border: 1px solid rgba(255,255,255,.1);
-  border-radius: 6px; color: var(--text); font-family: inherit; font-size: .9rem;
+.edit-card h3 {
+  font-weight: 400; font-size: 1.1rem; margin-bottom: 1.5rem;
+  color: var(--text); letter-spacing: 1px;
 }
-.edit-overlay-content textarea { min-height: 80px; resize: vertical; }
-.edit-overlay-content .btn-row { display: flex; gap: .5rem; justify-content: flex-end; }
+.edit-card label {
+  display: block; font-size: .78rem; color: var(--text-dim);
+  margin-bottom: .3rem; letter-spacing: .5px;
+}
+.edit-card textarea, .edit-card input {
+  width: 100%; padding: .7rem .9rem; margin-bottom: 1.2rem;
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: 6px; color: var(--text); font-family: inherit;
+  font-size: .9rem; resize: vertical;
+}
+.edit-card textarea { min-height: 60px; }
+.edit-card textarea:focus, .edit-card input:focus {
+  outline: none; border-color: var(--gold);
+}
+.edit-card .btn-row { display: flex; gap: .6rem; justify-content: flex-end; }
 
 .btn {
   padding: .6rem 1.4rem; border-radius: 6px; cursor: pointer;
-  font-family: inherit; font-size: .85rem; border: none; transition: var(--transition);
+  font-family: inherit; font-size: .85rem; border: none; transition: all .25s;
 }
-.btn-primary { background: var(--gold); color: #1a1a1c; }
-.btn-primary:hover { background: var(--gold-light); }
-.btn-danger { background: transparent; color: #c44; border: 1px solid rgba(204,68,68,.3); }
-.btn-danger:hover { background: rgba(204,68,68,.1); }
-.btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,.1); }
-.btn-secondary:hover { border-color: rgba(255,255,255,.3); }
-
-/* ===== Lightbox ===== */
-.lightbox {
-  display: none; position: fixed; inset: 0; z-index: 300;
-  background: rgba(0,0,0,.94); align-items: center; justify-content: center;
-  cursor: zoom-out;
-}
-.lightbox.open { display: flex; }
-.lightbox img { max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px; }
-.lightbox-close {
-  position: absolute; top: 1.5rem; right: 2rem;
-  color: rgba(255,255,255,.6); font-size: 2.5rem; cursor: pointer;
-  background: none; border: none; z-index: 301; font-weight: 300;
-}
-
-/* ===== Music Mini Player ===== */
-.music-mini {
-  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 80;
-  display: flex; align-items: center; gap: .6rem;
-  background: rgba(0,0,0,.5); backdrop-filter: blur(12px);
-  border-radius: 999px; padding: .5rem .9rem .5rem .5rem;
-  border: 1px solid rgba(255,255,255,.08);
-  transition: var(--transition);
-}
-.music-mini:hover { border-color: rgba(255,255,255,.2); }
-.music-mini-btn {
-  width: 32px; height: 32px; border-radius: 50%;
-  border: none; background: rgba(255,255,255,.1);
-  color: var(--text-dim); cursor: pointer; font-size: .8rem;
-  display: flex; align-items: center; justify-content: center;
-  transition: var(--transition);
-}
-.music-mini-btn:hover { background: var(--gold); color: #1a1a1c; }
-.music-mini-info {
-  font-size: .75rem; color: var(--text-dim);
-  max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  cursor: pointer;
-}
-.music-mini-info:hover { color: var(--gold); }
+.btn-prime { background: var(--gold); color: #fff; }
+.btn-prime:hover { background: #a3823e; }
+.btn-ghost { background: transparent; color: var(--text-soft); border: 1px solid var(--line); }
+.btn-ghost:hover { border-color: var(--text-soft); }
+.btn-danger { background: transparent; color: #c44; border: 1px solid rgba(204,68,68,.2); }
+.btn-danger:hover { background: rgba(204,68,68,.06); }
 
 /* ===== Settings Panel ===== */
 .settings-panel {
   position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
-  z-index: 150; background: var(--surface);
-  border-left: 1px solid rgba(255,255,255,.08);
-  transition: right var(--transition); padding: 4rem 2rem 2rem;
-  overflow-y: auto;
+  z-index: 250; background: var(--surface);
+  border-left: 1px solid var(--line); padding: 4.5rem 2rem 2rem;
+  overflow-y: auto; transition: right .4s var(--ease-out);
+  box-shadow: -4px 0 24px rgba(0,0,0,.04);
 }
 .settings-panel.open { right: 0; }
 .settings-panel h3 {
-  font-weight: 400; color: var(--gold); margin-bottom: 1.5rem;
-  font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; letter-spacing: 1px;
+  font-weight: 400; color: var(--gold); margin-bottom: 1.8rem;
+  font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
+  letter-spacing: 2px;
 }
 .settings-group { margin-bottom: 2rem; }
 .settings-group label {
-  display: block; font-size: .8rem; color: var(--text-dim);
+  display: block; font-size: .78rem; color: var(--text-dim);
   margin-bottom: .5rem; letter-spacing: .5px;
 }
-.settings-group input {
-  width: 100%; padding: .7rem 1rem; background: var(--bg);
-  border: 1px solid rgba(255,255,255,.08); border-radius: 6px;
+.settings-group input[type="text"] {
+  width: 100%; padding: .7rem .9rem; background: var(--bg);
+  border: 1px solid var(--line); border-radius: 6px;
   color: var(--text); font-family: inherit; font-size: .85rem;
 }
-.settings-upload {
-  display: flex; align-items: center; gap: .8rem; padding: .7rem 1rem;
-  background: var(--bg); border: 1px dashed rgba(255,255,255,.12);
-  border-radius: 6px; cursor: pointer; color: var(--text-dim);
-  font-size: .85rem; transition: var(--transition);
+.settings-group input:focus { outline: none; border-color: var(--gold); }
+.upload-zone {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .8rem 1rem; background: var(--bg);
+  border: 1px dashed var(--line-lit); border-radius: 6px;
+  cursor: pointer; color: var(--text-soft); font-size: .85rem;
+  transition: all .3s;
 }
-.settings-upload:hover { border-color: var(--gold); color: var(--gold); }
+.upload-zone:hover { border-color: var(--gold); color: var(--gold); }
 .settings-overlay {
-  display: none; position: fixed; inset: 0; z-index: 140;
-  background: rgba(0,0,0,.3);
+  display: none; position: fixed; inset: 0; z-index: 240;
 }
 .settings-overlay.open { display: block; }
 
-/* ===== Empty State ===== */
-.empty-hint {
-  text-align: center; padding: 6rem 2rem;
-  color: var(--text-dim); font-size: 1rem; font-weight: 300;
+/* ===== Music Mini ===== */
+.music-mini {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 80;
+  display: flex; align-items: center; gap: .5rem;
+  background: var(--surface); border-radius: 999px;
+  padding: .4rem .8rem .4rem .4rem;
+  border: 1px solid var(--line-lit);
+  box-shadow: var(--shadow); transition: all .3s;
 }
-.empty-hint span { color: var(--gold); cursor: pointer; }
+.music-mini:hover { border-color: var(--line); box-shadow: var(--shadow-md); }
+.music-mini-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: none; background: var(--bg); color: var(--text-soft);
+  cursor: pointer; font-size: .7rem; display: flex;
+  align-items: center; justify-content: center; transition: all .25s;
+}
+.music-mini-btn:hover { background: var(--gold); color: #fff; }
+.music-mini span {
+  font-size: .75rem; color: var(--text-dim);
+  max-width: 100px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; cursor: pointer;
+}
+.music-mini span:hover { color: var(--gold); }
+
+/* ===== Lightbox ===== */
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 400;
+  background: rgba(44,36,22,.94); align-items: center;
+  justify-content: center; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 94vw; max-height: 92vh; object-fit: contain; border-radius: 2px; }
+.lightbox-close {
+  position: absolute; top: 1.5rem; right: 2rem;
+  color: rgba(255,255,255,.5); font-size: 2.5rem; cursor: pointer;
+  background: none; border: none; font-weight: 200;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  text-align: center; padding: 8rem 2rem; color: var(--text-dim);
+}
+.empty-state p { margin-bottom: 1.5rem; font-weight: 300; }
+.empty-state .btn { border-radius: 999px; }
 
 /* ===== Scrollbar ===== */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
-
-/* ===== Animations ===== */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.media-card { animation: fadeUp .8s ease both; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
-  .media-grid { gap: .5rem; }
-  .media-card:hover .annotation { width: 100px !important; }
-  .media-card:hover .annotation-inner { padding: 0 .5rem !important; font-size: .75rem; }
-  .media-card:hover .media-card-inner { transform: scale(1.08); }
-  .top-bar { padding: .8rem 1rem; }
-  .settings-panel { width: 320px; right: -340px; }
-  .edit-overlay-content { max-width: 90%; padding: 1.5rem; }
+  .main-stream { max-width: 100%; padding: 5rem 1rem 3rem; gap: 4rem; }
+  .anno { display: none; }
+  .topbar { padding: 1rem 1.2rem; }
+  .settings-panel { width: 100%; right: -100%; }
 }
-@media (max-width: 600px) {
-  .media-stage { padding: 4rem .5rem 2rem; }
-  .media-card { width: 100% !important; }
-  .media-card:hover .annotation { width: 0 !important; opacity: 0 !important; }
-  .media-card:hover .media-card-inner { transform: scale(1.03); }
-  .media-grid:hover .media-card:not(:hover) .media-card-inner { filter: brightness(.7) blur(0); }
-  .add-media-bar { bottom: 1rem; gap: .5rem; }
-  .add-media-btn { padding: .5rem 1rem; font-size: .75rem; }
-  .music-mini { bottom: .8rem; right: .8rem; }
+@media (max-width: 480px) {
+  .main-stream { gap: 2.5rem; }
+  .media-img { max-height: 60vh; }
+  .topbar-left { font-size: .85rem; letter-spacing: 2px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Background -->
-<div class="bg-layer" id="bgLayer"></div>
+<!-- Background Overlay -->
+<div class="bg-overlay" id="bgOverlay"></div>
 
 <!-- Top Bar -->
-<header class="top-bar">
-  <span class="site-title" id="siteTitle" contenteditable="false">MY SPACE</span>
-  <div class="top-actions">
-    <button class="icon-btn" id="bgBtn" onclick="toggleSettings('bg')" title="更换背景">
-      🖼<span class="tooltip">更换背景</span>
-    </button>
-    <button class="icon-btn" id="musicBtn" onclick="toggleSettings('music')" title="更换配乐">
-      ♪<span class="tooltip">更换配乐</span>
-    </button>
-    <button class="icon-btn" id="editToggle" onclick="toggleEditMode()" title="编辑">
-      ✎<span class="tooltip">编辑模式</span>
-    </button>
+<header class="topbar">
+  <div class="topbar-left" id="topTitle" contenteditable="false">MY SPACE</div>
+  <div class="topbar-right">
+    <button class="tb-btn" onclick="toggleSettings('bg')" title="背景">🖼</button>
+    <button class="tb-btn" onclick="toggleSettings('music')" title="配乐">♪</button>
+    <button class="tb-btn" id="editToggle" onclick="toggleEdit()" title="编辑">✎</button>
   </div>
 </header>
 
-<!-- Media Stage -->
-<main class="media-stage" id="mediaStage">
-  <div class="media-grid" id="mediaGrid"></div>
-  <div class="empty-hint" id="emptyHint" style="display:none">
-    还没有内容，<span onclick="document.getElementById('uploadPhoto').click()">上传照片</span> 或 <span onclick="document.getElementById('uploadVideoInput').click()">添加视频</span> 开始吧
-  </div>
-</main>
+<!-- Main Stream -->
+<main class="main-stream" id="mainStream"></main>
 
-<!-- Add Media Bar (Edit Mode) -->
-<div class="add-media-bar" id="addMediaBar">
-  <button class="add-media-btn" onclick="document.getElementById('uploadPhoto').click()">＋ 添加照片</button>
-  <button class="add-media-btn" onclick="document.getElementById('uploadVideoInput').click()">＋ 添加视频</button>
+<!-- Empty State -->
+<div class="empty-state" id="emptyState" style="display:none">
+  <p>空空如也</p>
+  <button class="btn btn-prime" onclick="document.getElementById('uploadPhoto').click()">＋ 添加照片</button>
+</div>
+
+<!-- Add Bar -->
+<div class="add-bar" id="addBar">
+  <button class="add-btn" onclick="document.getElementById('uploadPhoto').click()">＋ 照片</button>
+  <button class="add-btn" onclick="document.getElementById('uploadVideo').click()">＋ 视频</button>
+</div>
+
+<!-- Edit Overlay -->
+<div class="edit-overlay" id="editOverlay">
+  <div class="edit-card">
+    <h3>编辑标注</h3>
+    <label>左侧文字</label>
+    <textarea id="eoLeft" placeholder="悬停时显示在照片左侧..."></textarea>
+    <label>右侧文字</label>
+    <textarea id="eoRight" placeholder="悬停时显示在照片右侧..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-danger" id="eoDelete" style="margin-right:auto;">删除</button>
+      <button class="btn btn-ghost" onclick="closeEditOverlay()">取消</button>
+      <button class="btn btn-prime" onclick="saveAnnotation()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close">&times;</button>
+  <img src="" alt="" id="lbImg">
+</div>
+
+<!-- Music Mini -->
+<div class="music-mini" id="musicMini">
+  <button class="music-mini-btn" id="musicPlayBtn" onclick="toggleMusic()">▶</button>
+  <span id="musicLabel" onclick="toggleSettings('music')">未选择</span>
+  <audio id="audioPlayer" style="display:none" loop></audio>
 </div>
 
 <!-- Settings Panel -->
@@ -429,437 +448,292 @@ body {
   <div id="settingsContent"></div>
 </div>
 
-<!-- Edit Overlay (for annotations) -->
-<div class="edit-overlay" id="editOverlay">
-  <div class="edit-overlay-content">
-    <h3>编辑标注</h3>
-    <label style="font-size:.8rem;color:var(--text-dim);">左侧文字</label>
-    <textarea id="editLeftAnno" placeholder="鼠标悬停时显示在左侧的文字..."></textarea>
-    <label style="font-size:.8rem;color:var(--text-dim);">右侧文字</label>
-    <textarea id="editRightAnno" placeholder="鼠标悬停时显示在右侧的文字..."></textarea>
-    <div class="btn-row">
-      <button class="btn btn-danger" id="editDeleteBtn" style="margin-right:auto;">删除</button>
-      <button class="btn btn-secondary" onclick="closeEditOverlay()">取消</button>
-      <button class="btn btn-primary" onclick="saveAnnotation()">保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close">&times;</button>
-  <img src="" alt="" id="lightboxImg">
-</div>
-
-<!-- Music Mini Player -->
-<div class="music-mini" id="musicMini">
-  <button class="music-mini-btn" id="musicPlayBtn" onclick="toggleMusic()">▶</button>
-  <span class="music-mini-info" id="musicInfo" onclick="toggleSettings('music')">未选择配乐</span>
-  <input type="range" id="volumeSlider" min="0" max="100" value="30" style="width:60px;display:none;" oninput="setVolume(this.value)">
-  <audio id="audioPlayer" style="display:none" loop></audio>
-</div>
-
 <!-- Hidden Inputs -->
 <input type="file" id="uploadPhoto" accept="image/*" multiple style="display:none" onchange="addPhotos(this)">
+<input type="file" id="uploadVideo" accept="video/*" style="display:none" onchange="addVideo(this)">
 <input type="file" id="uploadBg" accept="image/*" style="display:none" onchange="changeBg(this)">
 <input type="file" id="uploadAudio" accept="audio/*" style="display:none" onchange="changeMusic(this)">
-<input type="file" id="uploadVideoInput" accept="video/*" style="display:none" onchange="addVideoFile(this)">
 
 <script>
-// ==================== DATA MODEL ====================
-const STORAGE_KEY = 'myspace_data';
+// ==================== DATA ====================
+const KEY = 'myspace_v2';
 
 const DEFAULTS = {
-  siteTitle: 'MY SPACE',
-  bgImage: '',
-  musicUrl: '',
-  musicName: '',
+  title: 'MY SPACE',
+  bg: '',
+  musicUrl: '', musicName: '',
   media: [
-    { type:'image', src:'', width:1600, height:1200, leftAnno:'', rightAnno:'' },
-    { type:'image', src:'', width:1200, height:1600, leftAnno:'', rightAnno:'' },
-    { type:'image', src:'', width:1600, height:1067, leftAnno:'', rightAnno:'' },
-    { type:'image', src:'', width:1200, height:1600, leftAnno:'', rightAnno:'' },
-    { type:'image', src:'', width:1600, height:1200, leftAnno:'', rightAnno:'' },
-    { type:'video', src:'', width:1920, height:1080, leftAnno:'', rightAnno:'', poster:'' },
+    { type:'image', src:'', w:1600, h:1200, left:'', right:'' },
+    { type:'image', src:'', w:1200, h:1600, left:'', right:'' },
+    { type:'image', src:'', w:1600, h:1067, left:'', right:'' },
+    { type:'image', src:'', w:1200, h:1600, left:'', right:'' },
+    { type:'image', src:'', w:1600, h:1200, left:'', right:'' },
+    { type:'video', src:'', w:1920, h:1080, left:'', right:'', poster:'' },
   ]
 };
 
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch(e) { return null; }
+function load() {
+  try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }
+  catch(e) { return null; }
 }
-
-function saveData(data) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch(e) {
-    if (e.name === 'QuotaExceededError') alert('存储空间不足，请删除一些媒体文件');
-  }
+function save(d) {
+  try { localStorage.setItem(KEY, JSON.stringify(d)); }
+  catch(e) { if (e.name === 'QuotaExceededError') alert('存储空间不足，请删除部分内容'); }
 }
-
-function getStore() {
-  let data = loadData();
-  if (!data) { data = JSON.parse(JSON.stringify(DEFAULTS)); saveData(data); }
-  // Ensure all fields exist
-  data.siteTitle = data.siteTitle ?? DEFAULTS.siteTitle;
-  data.bgImage = data.bgImage ?? DEFAULTS.bgImage;
-  data.musicUrl = data.musicUrl ?? DEFAULTS.musicUrl;
-  data.musicName = data.musicName ?? DEFAULTS.musicName;
-  data.media = data.media ?? DEFAULTS.media;
-  return data;
+function store() {
+  let d = load();
+  if (!d) { d = JSON.parse(JSON.stringify(DEFAULTS)); save(d); }
+  d.title = d.title ?? DEFAULTS.title;
+  d.bg = d.bg ?? DEFAULTS.bg;
+  d.musicUrl = d.musicUrl ?? DEFAULTS.musicUrl;
+  d.musicName = d.musicName ?? DEFAULTS.musicName;
+  d.media = d.media ?? DEFAULTS.media;
+  return d;
 }
 
 let editMode = false;
-let editingMediaIndex = -1;
-let settingsMode = '';
+let editingIdx = -1;
+let settingsType = '';
 
 // ==================== INIT ====================
 function init() {
-  const store = getStore();
-  document.getElementById('siteTitle').textContent = store.siteTitle || 'MY SPACE';
-  applyBg(store.bgImage);
-  applyMusic(store.musicUrl, store.musicName);
-  renderMedia();
-  // Also make title editable in edit mode
-  updateSiteTitleState();
+  const s = store();
+  document.getElementById('topTitle').textContent = s.title || 'MY SPACE';
+  applyBg(s.bg);
+  applyMusic(s.musicUrl, s.musicName);
+  renderStream();
 }
 
-function applyBg(bgImage) {
-  const layer = document.getElementById('bgLayer');
-  if (bgImage) {
-    layer.classList.add('has-image');
-    layer.style.backgroundImage = 'url(' + bgImage + ')';
+function applyBg(bg) {
+  const el = document.getElementById('bgOverlay');
+  if (bg) {
+    el.classList.add('active');
+    el.style.backgroundImage = 'url(' + bg + ')';
   } else {
-    layer.classList.remove('has-image');
-    layer.style.backgroundImage = '';
+    el.classList.remove('active');
+    el.style.backgroundImage = '';
   }
 }
 
 function applyMusic(url, name) {
   const audio = document.getElementById('audioPlayer');
-  const info = document.getElementById('musicInfo');
-  if (url) {
-    audio.src = url;
-    info.textContent = name || '自定义配乐';
-  } else {
-    audio.src = '';
-    info.textContent = '未选择配乐';
-  }
+  const label = document.getElementById('musicLabel');
+  if (url) { audio.src = url; label.textContent = name || '配乐'; }
+  else { audio.src = ''; label.textContent = '未选择'; }
 }
 
-// ==================== RENDER MEDIA ====================
-function renderMedia() {
-  const store = getStore();
-  const grid = document.getElementById('mediaGrid');
-  const emptyHint = document.getElementById('emptyHint');
-  const media = store.media || [];
+// ==================== RENDER ====================
+function renderStream() {
+  const s = store();
+  const stream = document.getElementById('mainStream');
+  const empty = document.getElementById('emptyState');
+  const media = s.media || [];
 
-  grid.innerHTML = '';
-
-  if (media.length === 0) {
-    emptyHint.style.display = 'block';
-    return;
-  }
-  emptyHint.style.display = 'none';
+  stream.innerHTML = '';
+  if (media.length === 0) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
 
   media.forEach((item, i) => {
-    const card = createMediaCard(item, i);
-    card.style.animationDelay = (i * 0.08) + 's';
-    grid.appendChild(card);
+    const el = createMediaItem(item, i);
+    el.style.animationDelay = (i * .1) + 's';
+    stream.appendChild(el);
   });
 }
 
-function createMediaCard(item, index) {
-  const card = document.createElement('div');
-  card.className = 'media-card';
-  card.dataset.index = index;
+function createMediaItem(item, idx) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'media-item';
+  wrapper.dataset.index = idx;
 
-  const inner = document.createElement('div');
-  inner.className = 'media-card-inner';
+  const stage = document.createElement('div');
+  stage.className = 'media-stage';
 
   if (item.type === 'video') {
-    // Left annotation
-    const leftAnno = createAnnotationEl('left', item.leftAnno);
-    inner.appendChild(leftAnno);
-
-    // Video element
-    const wrap = document.createElement('div');
-    wrap.className = 'video-wrap';
-    wrap.style.width = '320px';
-    wrap.style.height = '240px';
+    // ---- Video ----
+    const vWrap = document.createElement('div');
+    vWrap.className = 'media-video-wrap';
 
     const video = document.createElement('video');
     video.src = item.src || '';
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.style.width = '100%';
-    video.style.height = '100%';
+    video.muted = true; video.loop = true; video.playsInline = true;
     if (item.poster) video.poster = item.poster;
 
-    const hint = document.createElement('div');
-    hint.className = 'play-hint';
+    const badge = document.createElement('div');
+    badge.className = 'play-badge';
 
-    wrap.appendChild(video);
-    wrap.appendChild(hint);
+    vWrap.appendChild(video);
+    vWrap.appendChild(badge);
 
-    // Hover play/pause
-    wrap.addEventListener('mouseenter', () => {
-      video.play().catch(() => {});
-      wrap.classList.add('playing');
-    });
-    wrap.addEventListener('mouseleave', () => {
-      video.pause();
-      video.currentTime = 0;
-      wrap.classList.remove('playing');
+    vWrap.addEventListener('mouseenter', () => { video.play().catch(()=>{}); vWrap.classList.add('playing'); });
+    vWrap.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; vWrap.classList.remove('playing'); });
+    vWrap.addEventListener('click', (e) => {
+      if (editMode) { e.stopPropagation(); openEditOverlay(idx); }
     });
 
-    // Click in non-edit mode opens lightbox-ish view (fullscreen video)
-    wrap.addEventListener('click', (e) => {
-      if (editMode) { openEditOverlay(index); return; }
-      if (video.paused) {
-        video.play().catch(() => {});
-        wrap.classList.add('playing');
-      } else {
-        video.pause();
-        wrap.classList.remove('playing');
-      }
-    });
-
-    inner.appendChild(wrap);
-
-    // Right annotation
-    const rightAnno = createAnnotationEl('right', item.rightAnno);
-    inner.appendChild(rightAnno);
+    stage.appendChild(vWrap);
   } else {
-    // Image type
-    const leftAnno = createAnnotationEl('left', item.leftAnno);
-    inner.appendChild(leftAnno);
-
-    const imgWrap = document.createElement('div');
-    imgWrap.className = 'media-img-wrap';
-
-    // Calculate display height based on aspect ratio
-    const ratio = item.width && item.height ? item.width / item.height : 4/3;
-    const displayH = 280;
-    const displayW = Math.round(displayH * ratio);
-    imgWrap.style.height = displayH + 'px';
-    imgWrap.style.width = displayW + 'px';
-
+    // ---- Image ----
     const img = document.createElement('img');
-    img.src = item.src || placeholderImg(item.width, item.height);
-    img.alt = 'Photo ' + (index + 1);
+    img.className = 'media-img';
+    img.src = item.src || placeholder(item.w, item.h);
+    img.alt = 'Photo';
     img.loading = 'lazy';
-    imgWrap.appendChild(img);
-
-    // Click behavior
-    imgWrap.addEventListener('click', (e) => {
-      if (editMode) { e.stopPropagation(); openEditOverlay(index); return; }
-      openLightbox(item.src || placeholderImg(item.width, item.height));
+    img.addEventListener('click', (e) => {
+      if (editMode) { e.stopPropagation(); openEditOverlay(idx); return; }
+      openLightbox(item.src || placeholder(item.w, item.h));
     });
-
-    inner.appendChild(imgWrap);
-
-    const rightAnno = createAnnotationEl('right', item.rightAnno);
-    inner.appendChild(rightAnno);
+    stage.appendChild(img);
   }
 
-  card.appendChild(inner);
-  return card;
+  // Delete button (edit mode)
+  const delBtn = document.createElement('button');
+  delBtn.className = 'media-delete';
+  delBtn.textContent = '× 删除';
+  delBtn.onclick = function(e) { e.stopPropagation(); deleteMedia(idx); };
+
+  wrapper.appendChild(stage);
+  wrapper.appendChild(delBtn);
+
+  // Left annotation
+  if (item.left || editMode) {
+    const la = createAnno('left', item.left);
+    wrapper.appendChild(la);
+  }
+  // Right annotation
+  if (item.right || editMode) {
+    const ra = createAnno('right', item.right);
+    wrapper.appendChild(ra);
+  }
+
+  return wrapper;
 }
 
-function createAnnotationEl(side, text) {
-  const div = document.createElement('div');
-  div.className = 'annotation annotation-' + side;
-  const inner = document.createElement('div');
-  inner.className = 'annotation-inner';
-  inner.textContent = text || '';
-  div.appendChild(inner);
-  return div;
+function createAnno(side, text) {
+  const el = document.createElement('div');
+  el.className = 'anno anno-' + side;
+  const inner = document.createElement('span');
+  inner.className = 'anno-text';
+  inner.textContent = text || (side === 'left' ? '左侧标注' : '右侧标注');
+  const line = document.createElement('span');
+  line.className = 'anno-line';
+  // Show line on appropriate side
+  if (side === 'left') { el.appendChild(inner); el.appendChild(line); }
+  else { el.appendChild(line); el.appendChild(inner); }
+  return el;
 }
 
-function placeholderImg(w, h) {
-  // Generate a beautiful gradient placeholder
+function placeholder(w, h) {
   const ratio = (w && h) ? w/h : 4/3;
-  const ph = 280; const pw = Math.round(ph * ratio);
-  const hue = Math.floor(Math.random() * 60) + 200; // blue-ish tones
+  const ph = 600; const pw = Math.round(ph * ratio);
   return 'data:image/svg+xml,' + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="'+pw+'" height="'+ph+'">' +
-    '<rect fill="#2a2a2e" width="'+pw+'" height="'+ph+'"/>' +
-    '<text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#555" font-size="18" font-family="sans-serif">点击上传照片</text>' +
+    '<svg xmlns="http://www.w3.org/2000/svg" width="'+pw+'" height="'+ph+'">'+
+    '<rect fill="#f2ede5" width="'+pw+'" height="'+ph+'"/>'+
+    '<rect fill="#e8e1d5" x="0" y="0" width="'+pw+'" height="'+ph+'" rx="0"/>'+
+    '<text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#c4bcaa" font-size="22" font-family="sans-serif">+ 上传照片</text>'+
     '</svg>'
   );
 }
 
 // ==================== EDIT MODE ====================
-function toggleEditMode() {
+function toggleEdit() {
   editMode = !editMode;
-  const btn = document.getElementById('editToggle');
   document.body.classList.toggle('edit-mode', editMode);
-  if (editMode) {
-    btn.classList.add('active');
-  } else {
-    btn.classList.remove('active');
-  }
-  updateSiteTitleState();
-  renderMedia(); // re-render to update click behaviors
+  document.getElementById('editToggle').classList.toggle('active', editMode);
+  const titleEl = document.getElementById('topTitle');
+  titleEl.contentEditable = editMode;
+  titleEl.style.cssText = editMode
+    ? 'outline:1px dashed rgba(184,148,75,.25);border-radius:4px;padding:2px 8px;'
+    : '';
+  renderStream();
 }
 
-function updateSiteTitleState() {
-  const title = document.getElementById('siteTitle');
-  title.contentEditable = editMode;
-  if (editMode) {
-    title.style.outline = '1px dashed rgba(201,169,110,.3)';
-    title.style.borderRadius = '4px';
-    title.style.padding = '2px 8px';
-  } else {
-    title.style.outline = '';
-    title.style.borderRadius = '';
-    title.style.padding = '';
-  }
-}
-
-// Save title on input
-document.getElementById('siteTitle').addEventListener('input', function() {
+document.getElementById('topTitle').addEventListener('input', function() {
   if (!editMode) return;
-  const store = getStore();
-  store.siteTitle = this.textContent;
-  saveData(store);
+  const s = store(); s.title = this.textContent; save(s);
 });
 
-// ==================== ANNOTATION EDITING ====================
-function openEditOverlay(index) {
-  editingMediaIndex = index;
-  const store = getStore();
-  const item = store.media[index];
-  document.getElementById('editLeftAnno').value = item.leftAnno || '';
-  document.getElementById('editRightAnno').value = item.rightAnno || '';
+// ==================== EDIT OVERLAY ====================
+function openEditOverlay(idx) {
+  editingIdx = idx;
+  const s = store();
+  const item = s.media[idx];
+  document.getElementById('eoLeft').value = item.left || '';
+  document.getElementById('eoRight').value = item.right || '';
   document.getElementById('editOverlay').classList.add('open');
-  document.getElementById('editDeleteBtn').onclick = function() {
-    deleteMedia(index);
-    closeEditOverlay();
+  document.getElementById('eoDelete').onclick = function() {
+    deleteMedia(idx); closeEditOverlay();
   };
 }
 
 function closeEditOverlay() {
   document.getElementById('editOverlay').classList.remove('open');
-  editingMediaIndex = -1;
+  editingIdx = -1;
 }
 
 function saveAnnotation() {
-  if (editingMediaIndex < 0) return;
-  const store = getStore();
-  store.media[editingMediaIndex].leftAnno = document.getElementById('editLeftAnno').value;
-  store.media[editingMediaIndex].rightAnno = document.getElementById('editRightAnno').value;
-  saveData(store);
-  renderMedia();
+  if (editingIdx < 0) return;
+  const s = store();
+  s.media[editingIdx].left = document.getElementById('eoLeft').value;
+  s.media[editingIdx].right = document.getElementById('eoRight').value;
+  save(s);
+  renderStream();
   closeEditOverlay();
 }
 
-function deleteMedia(index) {
-  if (!confirm('确定删除这个媒体吗？')) return;
-  const store = getStore();
-  store.media.splice(index, 1);
-  saveData(store);
-  renderMedia();
+function deleteMedia(idx) {
+  if (!confirm('确定删除吗？')) return;
+  const s = store();
+  s.media.splice(idx, 1);
+  save(s);
+  renderStream();
 }
 
-// ==================== ADD PHOTOS ====================
+// ==================== ADD MEDIA ====================
 function addPhotos(input) {
   const files = Array.from(input.files);
   if (!files.length) return;
-
-  const store = getStore();
-  let processed = 0;
+  const s = store();
+  let done = 0;
 
   files.forEach(file => {
-    if (!file.type.startsWith('image/')) { processed++; return; }
-    if (file.size > 8 * 1024 * 1024) { alert(file.name + ' 超过 8MB，已跳过'); processed++; return; }
-
+    if (!file.type.startsWith('image/')) { done++; return; }
     const reader = new FileReader();
     reader.onload = function(e) {
-      // Get image dimensions
       const img = new Image();
       img.onload = function() {
-        store.media.push({
-          type: 'image',
-          src: e.target.result,
-          width: img.width,
-          height: img.height,
-          leftAnno: '',
-          rightAnno: ''
-        });
-        processed++;
-        if (processed === files.length) {
-          saveData(store);
-          renderMedia();
-        }
+        s.media.push({ type:'image', src:e.target.result, w:img.width, h:img.height, left:'', right:'' });
+        done++; if (done === files.length) { save(s); renderStream(); }
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   });
-
   input.value = '';
 }
 
-// ==================== ADD VIDEO ====================
-function addVideoFile(input) {
+function addVideo(input) {
   const file = input.files[0];
   if (!file) return;
-
-  if (file.size > 30 * 1024 * 1024) { alert('视频超过 30MB，建议使用较小的文件'); return; }
-
-  const store = getStore();
+  if (file.size > 50 * 1024 * 1024) { alert('视频建议不超过 50MB'); return; }
+  const s = store();
   const reader = new FileReader();
   reader.onload = function(e) {
-    // Generate a poster from video first frame
     const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.muted = true;
-
-    const blobUrl = URL.createObjectURL(file);
-    video.src = blobUrl;
-
-    video.onloadeddata = function() {
-      // Try to capture poster frame
-      video.currentTime = 1;
-    };
-
+    video.preload = 'metadata'; video.muted = true;
+    const blob = URL.createObjectURL(file);
+    video.src = blob;
+    video.onloadeddata = function() { video.currentTime = 1; };
     video.onseeked = function() {
+      let poster = '';
       try {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0);
-        const poster = canvas.toDataURL('image/jpeg', 0.7);
-
-        store.media.push({
-          type: 'video',
-          src: e.target.result,
-          width: video.videoWidth,
-          height: video.videoHeight,
-          leftAnno: '',
-          rightAnno: '',
-          poster: poster
-        });
-      } catch(err) {
-        store.media.push({
-          type: 'video',
-          src: e.target.result,
-          width: 1920,
-          height: 1080,
-          leftAnno: '',
-          rightAnno: '',
-          poster: ''
-        });
-      }
-      URL.revokeObjectURL(blobUrl);
-      saveData(store);
-      renderMedia();
+        const c = document.createElement('canvas');
+        c.width = video.videoWidth; c.height = video.videoHeight;
+        c.getContext('2d').drawImage(video,0,0);
+        poster = c.toDataURL('image/jpeg',.7);
+      } catch(_) {}
+      s.media.push({ type:'video', src:e.target.result, w:video.videoWidth, h:video.videoHeight, left:'', right:'', poster });
+      URL.revokeObjectURL(blob);
+      save(s); renderStream();
     };
   };
   reader.readAsDataURL(file);
@@ -869,63 +743,48 @@ function addVideoFile(input) {
 // ==================== LIGHTBOX ====================
 function openLightbox(src) {
   if (editMode) return;
-  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lbImg').src = src;
   document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function closeLightbox() {
   document.getElementById('lightbox').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-// ==================== SETTINGS PANEL ====================
-function toggleSettings(mode) {
-  if (settingsMode === mode && document.getElementById('settingsPanel').classList.contains('open')) {
-    closeSettings();
-    return;
+// ==================== SETTINGS ====================
+function toggleSettings(type) {
+  if (settingsType === type && document.getElementById('settingsPanel').classList.contains('open')) {
+    closeSettings(); return;
   }
-  settingsMode = mode;
+  settingsType = type;
   const panel = document.getElementById('settingsPanel');
   const overlay = document.getElementById('settingsOverlay');
   const title = document.getElementById('settingsTitle');
   const content = document.getElementById('settingsContent');
-  const store = getStore();
+  const s = store();
 
-  if (mode === 'bg') {
+  if (type === 'bg') {
     title.textContent = '更换背景';
-    content.innerHTML = `
-      <div class="settings-group">
-        <label>上传背景图片</label>
-        <div class="settings-upload" onclick="document.getElementById('uploadBg').click()">
-          <span>📁</span> 选择图片文件
-        </div>
-      </div>
-      <div class="settings-group">
-        <label>或输入图片URL</label>
-        <input type="text" id="bgUrlInput" placeholder="https://..." value="${store.bgImage && !store.bgImage.startsWith('data:') ? store.bgImage : ''}">
-        <button class="btn btn-primary" style="margin-top:.8rem;width:100%;" onclick="applyBgUrl()">应用背景</button>
-      </div>
-      ${store.bgImage ? `<button class="btn btn-secondary" style="width:100%;margin-top:.5rem;" onclick="removeBg()">移除背景</button>` : ''}
-    `;
-  } else if (mode === 'music') {
+    content.innerHTML =
+      '<div class="settings-group"><label>上传背景图片</label>'+
+      '<div class="upload-zone" onclick="document.getElementById(\'uploadBg\').click()">📁 选择图片文件</div></div>'+
+      '<div class="settings-group"><label>或输入图片 URL</label>'+
+      '<input type="text" id="bgUrl" placeholder="https://..." value="'+(s.bg&&!s.bg.startsWith('data:')?escHtml(s.bg):'')+'">'+
+      '<button class="btn btn-prime" style="margin-top:.6rem;width:100%;" onclick="applyBgUrl()">应用</button></div>'+
+      (s.bg ? '<button class="btn btn-ghost" style="width:100%;" onclick="removeBg()">移除背景</button>' : '');
+  } else if (type === 'music') {
     title.textContent = '更换配乐';
-    content.innerHTML = `
-      <div class="settings-group">
-        <label>上传音频文件</label>
-        <div class="settings-upload" onclick="document.getElementById('uploadAudio').click()">
-          <span>📁</span> 选择音频 (MP3/WAV)
-        </div>
-        ${store.musicName ? `<p style="font-size:.8rem;color:var(--gold);margin-top:.5rem;">当前: ${store.musicName}</p>` : ''}
-      </div>
-      <div class="settings-group">
-        <label>或输入音频URL</label>
-        <input type="text" id="musicUrlInput" placeholder="https://..." value="${store.musicUrl && !store.musicUrl.startsWith('data:') ? store.musicUrl : ''}">
-        <input type="text" id="musicNameInput" placeholder="曲目名称" value="${store.musicName && !store.musicUrl.startsWith('data:') ? store.musicName : ''}" style="margin-top:.5rem;">
-        <button class="btn btn-primary" style="margin-top:.8rem;width:100%;" onclick="applyMusicUrl()">应用配乐</button>
-      </div>
-      ${store.musicUrl ? `<button class="btn btn-secondary" style="width:100%;margin-top:.5rem;" onclick="removeMusic()">移除配乐</button>` : ''}
-    `;
+    content.innerHTML =
+      '<div class="settings-group"><label>上传音频文件</label>'+
+      '<div class="upload-zone" onclick="document.getElementById(\'uploadAudio\').click()">📁 选择音频 (MP3/WAV)</div>'+
+      (s.musicName ? '<p style="font-size:.78rem;color:var(--gold);margin-top:.5rem;">当前：'+escHtml(s.musicName)+'</p>' : '')+
+      '</div>'+
+      '<div class="settings-group"><label>或输入音频 URL</label>'+
+      '<input type="text" id="musicUrl" placeholder="https://..." value="'+(s.musicUrl&&!s.musicUrl.startsWith('data:')?escHtml(s.musicUrl):'')+'">'+
+      '<input type="text" id="musicName" placeholder="曲目名称" style="margin-top:.5rem;" value="'+(s.musicName&&!s.musicUrl.startsWith('data:')?escHtml(s.musicName):'')+'">'+
+      '<button class="btn btn-prime" style="margin-top:.6rem;width:100%;" onclick="applyMusicUrl()">应用</button></div>'+
+      (s.musicUrl ? '<button class="btn btn-ghost" style="width:100%;" onclick="removeMusic()">移除配乐</button>' : '');
   }
 
   panel.classList.add('open');
@@ -935,45 +794,29 @@ function toggleSettings(mode) {
 function closeSettings() {
   document.getElementById('settingsPanel').classList.remove('open');
   document.getElementById('settingsOverlay').classList.remove('open');
-  settingsMode = '';
+  settingsType = '';
 }
 
 function applyBgUrl() {
-  const url = document.getElementById('bgUrlInput').value.trim();
+  const url = document.getElementById('bgUrl').value.trim();
   if (!url) return;
-  const store = getStore();
-  store.bgImage = url;
-  saveData(store);
-  applyBg(url);
-  closeSettings();
+  const s = store(); s.bg = url; save(s);
+  applyBg(url); closeSettings();
 }
-
 function removeBg() {
-  const store = getStore();
-  store.bgImage = '';
-  saveData(store);
-  applyBg('');
-  closeSettings();
+  const s = store(); s.bg = ''; save(s);
+  applyBg(''); closeSettings();
 }
-
 function applyMusicUrl() {
-  const url = document.getElementById('musicUrlInput').value.trim();
-  const name = document.getElementById('musicNameInput').value.trim() || '自定义配乐';
+  const url = document.getElementById('musicUrl').value.trim();
+  const name = document.getElementById('musicName').value.trim()||'配乐';
   if (!url) return;
-  const store = getStore();
-  store.musicUrl = url;
-  store.musicName = name;
-  saveData(store);
-  applyMusic(url, name);
-  closeSettings();
+  const s = store(); s.musicUrl = url; s.musicName = name; save(s);
+  applyMusic(url, name); closeSettings();
 }
-
 function removeMusic() {
-  const store = getStore();
-  store.musicUrl = '';
-  store.musicName = '';
-  saveData(store);
-  applyMusic('', '');
+  const s = store(); s.musicUrl = ''; s.musicName = ''; save(s);
+  applyMusic('','');
   document.getElementById('audioPlayer').pause();
   document.getElementById('musicPlayBtn').textContent = '▶';
   closeSettings();
@@ -982,14 +825,10 @@ function removeMusic() {
 function changeBg(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) { alert('背景图片不能超过 5MB'); input.value = ''; return; }
   const reader = new FileReader();
   reader.onload = function(e) {
-    const store = getStore();
-    store.bgImage = e.target.result;
-    saveData(store);
-    applyBg(e.target.result);
-    closeSettings();
+    const s = store(); s.bg = e.target.result; save(s);
+    applyBg(e.target.result); closeSettings();
   };
   reader.readAsDataURL(file);
   input.value = '';
@@ -998,19 +837,13 @@ function changeBg(input) {
 function changeMusic(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 10 * 1024 * 1024) { alert('音频文件不能超过 10MB'); input.value = ''; return; }
-  const url = URL.createObjectURL(file);
-  const name = file.name.replace(/\.[^.]+$/, '');
-  const store = getStore();
-
-  // Read as base64 for persistence
   const reader = new FileReader();
   reader.onload = function(e) {
-    URL.revokeObjectURL(url);
-    store.musicUrl = e.target.result;
-    store.musicName = name;
-    saveData(store);
-    applyMusic(e.target.result, name);
+    const s = store();
+    s.musicUrl = e.target.result;
+    s.musicName = file.name.replace(/\.[^.]+$/, '');
+    save(s);
+    applyMusic(e.target.result, s.musicName);
     closeSettings();
   };
   reader.readAsDataURL(file);
@@ -1022,40 +855,25 @@ function toggleMusic() {
   const audio = document.getElementById('audioPlayer');
   const btn = document.getElementById('musicPlayBtn');
   if (!audio.src) { toggleSettings('music'); return; }
-  if (audio.paused) {
-    audio.play().catch(() => {});
-    btn.textContent = '⏸';
-  } else {
-    audio.pause();
-    btn.textContent = '▶';
-  }
+  if (audio.paused) { audio.play().catch(()=>{}); btn.textContent='⏸'; }
+  else { audio.pause(); btn.textContent='▶'; }
 }
+document.getElementById('audioPlayer').addEventListener('play', ()=>{
+  document.getElementById('musicPlayBtn').textContent='⏸';
+});
+document.getElementById('audioPlayer').addEventListener('pause', ()=>{
+  document.getElementById('musicPlayBtn').textContent='▶';
+});
 
-function setVolume(val) {
-  document.getElementById('audioPlayer').volume = val / 100;
+// ==================== UTILS ====================
+function escHtml(s) {
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
 }
-
-// Audio events
-document.getElementById('audioPlayer').addEventListener('play', function() {
-  document.getElementById('musicPlayBtn').textContent = '⏸';
-});
-document.getElementById('audioPlayer').addEventListener('pause', function() {
-  document.getElementById('musicPlayBtn').textContent = '▶';
-});
-
-// Volume slider toggle on music info click (hold or right-click)
-document.getElementById('musicInfo').addEventListener('contextmenu', function(e) {
-  e.preventDefault();
-  const slider = document.getElementById('volumeSlider');
-  slider.style.display = slider.style.display === 'none' ? 'block' : 'none';
-});
 
 // ==================== KEYBOARD ====================
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
-    closeLightbox();
-    closeEditOverlay();
-    closeSettings();
+    closeLightbox(); closeEditOverlay(); closeSettings();
   }
 });
 
