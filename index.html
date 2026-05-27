@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的空间</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf8f5;
+  --text: #2c2416;
+  --text-light: #6b6358;
+  --accent: #b8944b;
+  --accent-dark: #9a7b3a;
+  --card: #fff;
+  --card-hover: #fdfaf5;
+  --border: #e8e0d5;
+  --shadow: 0 4px 24px rgba(0,0,0,.06);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,.1);
+  --radius: 12px;
+  --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --max-w: 1100px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior:smooth; font-size:16px; }
+
+body {
+  font-family: 'Noto Serif SC', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Navbar ===== */
+.nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  background: rgba(250,248,245,.85); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  transition: var(--transition);
+}
+.nav-inner {
+  max-width: var(--max-w); margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  height: 60px;
+}
+.nav-links { display:flex; gap:2rem; list-style:none; }
+.nav-links a {
+  text-decoration:none; color:var(--text-light);
+  font-size:.9rem; letter-spacing:.5px;
+  transition: var(--transition);
+}
+.nav-links a:hover { color:var(--accent); }
+.nav-title { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text); font-weight:600; }
+.nav-actions { display:flex; align-items:center; gap:1rem; }
+
+/* Edit toggle */
+.edit-toggle {
+  display:flex; align-items:center; gap:.5rem;
+  cursor:pointer; font-size:.85rem; color:var(--text-light);
+  user-select:none;
+}
+.edit-switch {
+  width:42px; height:24px; background:var(--border);
+  border-radius:12px; position:relative;
+  transition: var(--transition);
+}
+.edit-switch::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:18px; height:18px; background:#fff;
+  border-radius:50%; transition: var(--transition);
+}
+.edit-toggle.active .edit-switch { background:var(--accent); }
+.edit-toggle.active .edit-switch::after { transform:translateX(18px); }
+.edit-toggle.active .edit-label { color:var(--accent); }
+
+/* ===== Hero ===== */
+.hero {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  text-align:center; position:relative;
+  background: linear-gradient(135deg, #faf8f5 0%, #f0ebe0 40%, #e8dfd0 100%);
+  padding: 6rem 2rem 4rem;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(184,148,75,.08) 0%, transparent 70%);
+}
+.hero-content { position:relative; z-index:1; max-width:600px; }
+.hero-avatar {
+  width:120px; height:120px; border-radius:50%;
+  object-fit:cover; border:3px solid var(--accent);
+  box-shadow: 0 8px 32px rgba(184,148,75,.2);
+  margin-bottom:2rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.hero-avatar:hover { transform:scale(1.05); }
+.hero h1 {
+  font-family:'Playfair Display',serif;
+  font-size:3.5rem; font-weight:600;
+  letter-spacing:2px; margin-bottom:.5rem;
+  color: var(--text);
+}
+.hero .tagline {
+  font-size:1.15rem; color:var(--text-light);
+  letter-spacing:1px; margin-bottom:2rem;
+}
+.hero-scroll {
+  position:absolute; bottom:2rem; left:50%; transform:translateX(-50%);
+  animation: floatDown 2s ease-in-out infinite;
+  color: var(--accent); font-size:1.5rem; cursor:default;
+}
+@keyframes floatDown { 0%,100% { transform:translateX(-50%) translateY(0); opacity:.6; } 50% { transform:translateX(-50%) translateY(8px); opacity:1; } }
+
+/* ===== Section Common ===== */
+.section {
+  max-width:var(--max-w); margin:0 auto;
+  padding: 6rem 2rem;
+}
+.section-header {
+  text-align:center; margin-bottom:4rem;
+}
+.section-header h2 {
+  font-family:'Playfair Display',serif;
+  font-size:2.2rem; font-weight:600;
+  letter-spacing:1px; margin-bottom:.8rem;
+}
+.section-header .line {
+  width:50px; height:2px; background:var(--accent);
+  margin:0 auto; border-radius:1px;
+}
+.section-header p { color:var(--text-light); margin-top:1rem; font-size:.95rem; }
+
+/* ===== About ===== */
+.about-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:3rem;
+  align-items:start;
+}
+.about-text {
+  font-size:1rem; line-height:2;
+  color:var(--text-light);
+  min-height:100px;
+  padding:1rem; border-radius:var(--radius);
+  border:1px solid transparent;
+  transition: var(--transition);
+}
+.about-text:focus { outline:none; border-color:var(--accent); background:var(--card); }
+.timeline { list-style:none; }
+.timeline li {
+  position:relative; padding-left:2rem; padding-bottom:2rem;
+  border-left:2px solid var(--border);
+}
+.timeline li:last-child { padding-bottom:0; }
+.timeline li::before {
+  content:''; position:absolute; left:-6px; top:6px;
+  width:10px; height:10px; background:var(--accent);
+  border-radius:50%;
+}
+.timeline .year {
+  font-size:.85rem; color:var(--accent);
+  font-weight:600; letter-spacing:1px;
+}
+.timeline .desc { font-size:.95rem; color:var(--text-light); margin-top:.2rem; min-height:1.5rem; }
+.contact-row { display:flex; gap:2rem; flex-wrap:wrap; margin-top:2rem; }
+.contact-item { display:flex; align-items:center; gap:.6rem; color:var(--text-light); font-size:.95rem; }
+.contact-item svg { flex-shrink:0; }
+
+/* ===== Gallery ===== */
+.gallery-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:1.5rem;
+}
+.gallery-card {
+  position:relative; border-radius:var(--radius);
+  overflow:hidden; cursor:pointer;
+  aspect-ratio:4/3;
+  background:var(--border);
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+.gallery-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+.gallery-card img {
+  width:100%; height:100%; object-fit:cover;
+  transition: var(--transition);
+}
+.gallery-card:hover img { transform:scale(1.05); }
+.gallery-card .del-btn {
+  display:none; position:absolute; top:.5rem; right:.5rem;
+  width:28px; height:28px; background:rgba(0,0,0,.6); color:#fff;
+  border:none; border-radius:50%; cursor:pointer;
+  font-size:1rem; line-height:28px; text-align:center;
+  z-index:2;
+}
+.edit-mode .gallery-card .del-btn { display:block; }
+.gallery-upload {
+  display:none; aspect-ratio:4/3;
+  border:2px dashed var(--border); border-radius:var(--radius);
+  flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-light); gap:.5rem;
+  transition: var(--transition);
+}
+.edit-mode .gallery-upload { display:flex; }
+.gallery-upload:hover { border-color:var(--accent); color:var(--accent); }
+.gallery-upload svg { width:36px; height:36px; }
+
+/* Lightbox */
+.lightbox {
+  display:none; position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,.92); align-items:center; justify-content:center;
+  cursor:pointer;
+}
+.lightbox.open { display:flex; }
+.lightbox img { max-width:90vw; max-height:85vh; object-fit:contain; border-radius:4px; }
+.lightbox-close {
+  position:absolute; top:1.5rem; right:2rem;
+  color:#fff; font-size:2rem; cursor:pointer;
+  background:none; border:none; z-index:201;
+}
+
+/* ===== Video ===== */
+.video-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(380px, 1fr));
+  gap:2rem;
+}
+.video-card {
+  background:var(--card); border-radius:var(--radius);
+  overflow:hidden; box-shadow:var(--shadow);
+  transition: var(--transition);
+  position:relative;
+}
+.video-card:hover { box-shadow:var(--shadow-lg); }
+.video-wrapper {
+  position:relative; padding-bottom:56.25%; height:0;
+  background:#000;
+}
+.video-wrapper iframe {
+  position:absolute; inset:0; width:100%; height:100%; border:0;
+}
+.video-card .del-btn {
+  display:none; position:absolute; top:.5rem; right:.5rem;
+  width:28px; height:28px; background:rgba(0,0,0,.6); color:#fff;
+  border:none; border-radius:50%; cursor:pointer; z-index:2;
+  font-size:1rem; line-height:28px; text-align:center;
+}
+.edit-mode .video-card .del-btn { display:block; }
+.video-add {
+  display:none; background:var(--card); border-radius:var(--radius);
+  padding:2rem; box-shadow:var(--shadow);
+}
+.edit-mode .video-add { display:block; }
+.video-add input {
+  width:100%; padding:.8rem 1rem; border:1px solid var(--border);
+  border-radius:var(--radius); font-family:inherit; font-size:.95rem;
+  margin-bottom:.8rem;
+}
+.video-add .btn { margin-right:.5rem; }
+
+/* ===== Diary ===== */
+.diary-list { display:flex; flex-direction:column; gap:2rem; }
+.diary-card {
+  background:var(--card); border-radius:var(--radius);
+  padding:2.5rem; box-shadow:var(--shadow);
+  transition: var(--transition);
+  position:relative;
+}
+.diary-card:hover { box-shadow:var(--shadow-lg); }
+.diary-card .date {
+  font-size:.85rem; color:var(--accent);
+  letter-spacing:1px; font-weight:500;
+  margin-bottom:.5rem;
+}
+.diary-card h3 {
+  font-family:'Playfair Display',serif;
+  font-size:1.5rem; margin-bottom:1rem;
+  color:var(--text);
+}
+.diary-card .content { color:var(--text-light); line-height:2; min-height:2rem; }
+.diary-card .del-btn {
+  display:none; position:absolute; top:1rem; right:1rem;
+  background:none; border:none; color:#c44; cursor:pointer;
+  font-size:1.2rem;
+}
+.edit-mode .diary-card .del-btn { display:block; }
+.diary-add {
+  display:none; background:var(--card); border-radius:var(--radius);
+  padding:2rem; box-shadow:var(--shadow);
+}
+.edit-mode .diary-add { display:block; }
+.diary-add input, .diary-add textarea {
+  width:100%; padding:.8rem 1rem; border:1px solid var(--border);
+  border-radius:var(--radius); font-family:inherit; font-size:.95rem;
+  margin-bottom:1rem;
+}
+.diary-add textarea { min-height:120px; resize:vertical; }
+
+/* Buttons */
+.btn {
+  display:inline-block; padding:.7rem 1.8rem;
+  background:var(--accent); color:#fff; border:none;
+  border-radius:6px; cursor:pointer; font-family:inherit;
+  font-size:.9rem; letter-spacing:.5px;
+  transition: var(--transition);
+}
+.btn:hover { background:var(--accent-dark); }
+.btn-outline {
+  background:transparent; border:1px solid var(--accent);
+  color:var(--accent);
+}
+.btn-outline:hover { background:var(--accent); color:#fff; }
+.btn-sm { padding:.4rem 1rem; font-size:.8rem; }
+
+/* ===== Music Player ===== */
+.music-player {
+  position:fixed; bottom:1.5rem; right:1.5rem; z-index:150;
+  background:var(--card); border-radius:var(--radius);
+  padding:.8rem 1.2rem; box-shadow:var(--shadow-lg);
+  display:flex; align-items:center; gap:.8rem;
+  transition: var(--transition);
+  max-width:320px;
+}
+.music-btn {
+  width:36px; height:36px; border-radius:50%;
+  border:1px solid var(--border); background:var(--card);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition: var(--transition); color:var(--text);
+  flex-shrink:0;
+}
+.music-btn:hover { border-color:var(--accent); color:var(--accent); }
+.music-btn.playing { background:var(--accent); border-color:var(--accent); color:#fff; }
+.music-info { flex:1; min-width:0; }
+.music-info .track-name {
+  font-size:.85rem; white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis; color:var(--text);
+}
+.music-info .track-artist {
+  font-size:.75rem; color:var(--text-light);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.music-select {
+  display:none; position:absolute; bottom:100%;
+  right:0; margin-bottom:.5rem;
+  background:var(--card); border-radius:var(--radius);
+  box-shadow:var(--shadow-lg); padding:.5rem;
+  min-width:220px;
+}
+.music-select.open { display:block; }
+.music-select .track-option {
+  padding:.6rem 1rem; cursor:pointer; border-radius:6px;
+  font-size:.9rem; transition:background .2s;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.music-select .track-option:hover { background:var(--card-hover); }
+.music-select .track-option.active { color:var(--accent); font-weight:500; }
+
+/* Edit mode helpers */
+.edit-mode [contenteditable]:focus {
+  outline:2px solid var(--accent); outline-offset:4px;
+  border-radius:4px;
+}
+.edit-mode .hero-avatar { cursor:pointer; position:relative; }
+.edit-mode .hero-avatar::after {
+  content:'点击更换'; position:absolute; bottom:0; left:50%;
+  transform:translateX(-50%); background:rgba(0,0,0,.7); color:#fff;
+  padding:.2rem .8rem; border-radius:999px; font-size:.7rem;
+  white-space:nowrap;
+}
+.edit-hint {
+  display:none; text-align:center; padding:.5rem;
+  background:var(--accent); color:#fff; font-size:.85rem;
+  position:fixed; top:60px; left:0; right:0; z-index:99;
+}
+.edit-mode .edit-hint { display:block; }
+
+/* Animations */
+.fade-in {
+  opacity:0; transform:translateY(24px);
+  transition: opacity .8s ease, transform .8s ease;
+}
+.fade-in.visible { opacity:1; transform:translateY(0); }
+
+/* Responsive */
+@media (max-width:768px) {
+  .hero h1 { font-size:2.2rem; }
+  .about-grid { grid-template-columns:1fr; }
+  .video-grid { grid-template-columns:1fr; }
+  .nav-links { gap:1rem; }
+  .nav-links a { font-size:.8rem; }
+  .section { padding:4rem 1.2rem; }
+  .diary-card { padding:1.5rem; }
+  .music-player { bottom:.8rem; right:.8rem; padding:.6rem .8rem; }
+}
+@media (max-width:480px) {
+  .nav { padding:0 1rem; }
+  .nav-links { gap:.6rem; }
+  .hero h1 { font-size:1.8rem; }
+  .gallery-grid { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
+  .music-player { max-width:260px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Edit hint -->
+<div class="edit-hint" id="editHint">编辑模式已开启 — 点击文字即可编辑，更改自动保存</div>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <span class="nav-title">My Space</span>
+    <ul class="nav-links">
+      <li><a href="#about">关于</a></li>
+      <li><a href="#gallery">影像</a></li>
+      <li><a href="#video">视频</a></li>
+      <li><a href="#diary">随笔</a></li>
+    </ul>
+    <div class="nav-actions">
+      <div class="edit-toggle" id="editToggle" onclick="toggleEditMode()">
+        <span class="edit-label">编辑</span>
+        <div class="edit-switch"></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <div class="hero-content">
+    <img class="hero-avatar" id="heroAvatar" src="" alt="头像" title="点击更换头像" onclick="if(editMode) document.getElementById('avatarInput').click()">
+    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="changeAvatar(this)">
+    <h1 contenteditable="false" id="heroName" data-key="hero_name">杨 振浩</h1>
+    <p class="tagline" contenteditable="false" id="heroTagline" data-key="hero_tagline">记录光影 · 珍藏时光</p>
+  </div>
+  <div class="hero-scroll">↓</div>
+</section>
+
+<!-- About -->
+<section class="section" id="about">
+  <div class="section-header">
+    <h2>关于我</h2>
+    <div class="line"></div>
+  </div>
+  <div class="about-grid">
+    <div>
+      <div class="about-text" contenteditable="false" id="aboutBio" data-key="about_bio">这里是一段自我介绍。点击编辑按钮可以修改这段文字，写下你的故事、你的兴趣、你的一切。</div>
+      <div class="contact-row">
+        <span class="contact-item">📧 <span contenteditable="false" data-key="contact_email">example@email.com</span></span>
+        <span class="contact-item">📍 <span contenteditable="false" data-key="contact_loc">中国</span></span>
+        <span class="contact-item">🔗 <span contenteditable="false" data-key="contact_web">个人网站</span></span>
+      </div>
+    </div>
+    <ul class="timeline" id="timeline">
+      <li><div class="year" contenteditable="false" data-key="tl_year_0">2024</div><div class="desc" contenteditable="false" data-key="tl_desc_0">开启新的旅程，学习前端开发</div></li>
+      <li><div class="year" contenteditable="false" data-key="tl_year_1">2023</div><div class="desc" contenteditable="false" data-key="tl_desc_1">完成大学学业，获得计算机科学学位</div></li>
+      <li><div class="year" contenteditable="false" data-key="tl_year_2">2020</div><div class="desc" contenteditable="false" data-key="tl_desc_2">第一次接触编程，被创造的魅力吸引</div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- Gallery -->
+<section class="section" id="gallery">
+  <div class="section-header">
+    <h2>影像集</h2>
+    <div class="line"></div>
+    <p>用镜头捕捉生活的温度</p>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+  <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="addPhotos(this)">
+</section>
+
+<!-- Video -->
+<section class="section" id="video">
+  <div class="section-header">
+    <h2>视频墙</h2>
+    <div class="line"></div>
+    <p>记录那些动人的瞬间</p>
+  </div>
+  <div class="video-grid" id="videoGrid"></div>
+  <div class="video-add" id="videoAdd">
+    <input type="text" id="videoUrlInput" placeholder="输入 YouTube 或 Vimeo 嵌入链接 (如: https://www.youtube.com/embed/...)">
+    <button class="btn" onclick="addVideo()">添加视频</button>
+  </div>
+</section>
+
+<!-- Diary -->
+<section class="section" id="diary">
+  <div class="section-header">
+    <h2>随笔记</h2>
+    <div class="line"></div>
+    <p>写下此刻的感悟</p>
+  </div>
+  <div class="diary-add" id="diaryAdd">
+    <input type="text" id="diaryTitle" placeholder="标题">
+    <input type="date" id="diaryDate">
+    <textarea id="diaryContent" placeholder="写下你的想法..."></textarea>
+    <button class="btn" onclick="addDiaryEntry()">发布随笔</button>
+  </div>
+  <div class="diary-list" id="diaryList"></div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close">&times;</button>
+  <img src="" alt="" id="lightboxImg">
+</div>
+
+<!-- Music Player -->
+<div class="music-player" id="musicPlayer">
+  <div class="music-select" id="musicSelect"></div>
+  <button class="music-btn" id="musicPlayBtn" onclick="toggleMusic()" title="播放/暂停">▶</button>
+  <div class="music-info">
+    <div class="track-name" id="trackName">未选择曲目</div>
+    <div class="track-artist" id="trackArtist">点击 - 选择配乐</div>
+  </div>
+  <button class="music-btn" onclick="nextTrack()" title="下一首">⏭</button>
+  <button class="music-btn" id="musicListBtn" onclick="toggleMusicList()" title="播放列表">☰</button>
+  <audio id="audioPlayer" style="display:none"></audio>
+  <input type="file" id="musicFileInput" accept="audio/*" style="display:none" onchange="addLocalMusic(this)">
+</div>
+
+<script>
+// ==================== DATA ====================
+const DEFAULTS = {
+  hero_name: '杨 振浩',
+  hero_tagline: '记录光影 · 珍藏时光',
+  hero_avatar: '',
+  about_bio: '这里是一段自我介绍。点击编辑按钮可以修改这段文字，写下你的故事、你的兴趣、你的一切。',
+  contact_email: 'example@email.com',
+  contact_loc: '中国',
+  contact_web: '个人网站',
+  tl_year_0: '2024', tl_desc_0: '开启新的旅程，学习前端开发',
+  tl_year_1: '2023', tl_desc_1: '完成大学学业，获得计算机科学学位',
+  tl_year_2: '2020', tl_desc_2: '第一次接触编程，被创造的魅力吸引',
+  gallery: [],
+  videos: [],
+  diary: [],
+  music_playlist: [
+    { name:'月光奏鸣曲', artist:'贝多芬', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+    { name:'宁静夜晚', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+    { name:'电子节拍', artist:'SoundHelix', url:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+  ],
+  music_index: 0
+};
+
+let editMode = false;
+let currentMusicIndex = 0;
+
+function load(key) {
+  try {
+    const raw = localStorage.getItem('diary_' + key);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function save(key, val) {
+  try {
+    localStorage.setItem('diary_' + key, JSON.stringify(val));
+  } catch(e) {
+    if (e.name === 'QuotaExceededError') {
+      alert('存储空间不足！请删除一些照片或视频以释放空间。');
+    }
+  }
+}
+
+function getData(key, fallback) {
+  const v = load(key);
+  return v !== null && v !== undefined ? v : fallback;
+}
+
+// ==================== INIT ====================
+function initAll() {
+  // Hero
+  const heroName = getData('hero_name', DEFAULTS.hero_name);
+  const heroTagline = getData('hero_tagline', DEFAULTS.hero_tagline);
+  const heroAvatar = getData('hero_avatar', DEFAULTS.hero_avatar);
+  document.getElementById('heroName').textContent = heroName;
+  document.getElementById('heroTagline').textContent = heroTagline;
+  if (heroAvatar) document.getElementById('heroAvatar').src = heroAvatar;
+  else document.getElementById('heroAvatar').src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect fill="#e8e0d5" width="120" height="120"/><text x="60" y="68" text-anchor="middle" font-size="40" fill="#b8944b">?</text></svg>');
+
+  // About
+  document.getElementById('aboutBio').textContent = getData('about_bio', DEFAULTS.about_bio);
+  ['contact_email','contact_loc','contact_web'].forEach(k => {
+    const el = document.querySelector('[data-key="'+k+'"]');
+    if (el) el.textContent = getData(k, DEFAULTS[k]);
+  });
+  for (let i=0;i<3;i++) {
+    ['year','desc'].forEach(f => {
+      const k = 'tl_'+f+'_'+i;
+      const el = document.querySelector('[data-key="'+k+'"]');
+      if (el) el.textContent = getData(k, DEFAULTS[k]);
+    });
+  }
+
+  // Gallery
+  renderGallery();
+
+  // Videos
+  renderVideos();
+
+  // Diary
+  renderDiary();
+  document.getElementById('diaryDate').value = new Date().toISOString().split('T')[0];
+
+  // Music
+  initMusic();
+
+  // Scroll animation
+  observeFadeIn();
+}
+
+// ==================== EDIT MODE ====================
+function toggleEditMode() {
+  editMode = !editMode;
+  const toggle = document.getElementById('editToggle');
+  const hint = document.getElementById('editHint');
+
+  if (editMode) {
+    toggle.classList.add('active');
+    hint.style.display = 'block';
+  } else {
+    toggle.classList.remove('active');
+    hint.style.display = 'none';
+  }
+
+  document.body.classList.toggle('edit-mode', editMode);
+
+  // Toggle contenteditable
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = editMode;
+  });
+
+  // Re-render gallery & videos to show/hide buttons
+  renderGallery();
+  renderVideos();
+  renderDiary();
+}
+
+// Auto-save on contenteditable change
+document.addEventListener('input', function(e) {
+  if (!editMode) return;
+  const el = e.target.closest('[data-key]');
+  if (!el) return;
+  if (el.closest('.diary-card')) return; // diary has its own save logic
+  const key = el.dataset.key;
+  save(key, el.textContent);
+});
+
+// ==================== HERO AVATAR ====================
+function changeAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64 = e.target.result;
+    document.getElementById('heroAvatar').src = base64;
+    save('hero_avatar', base64);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ==================== GALLERY ====================
+function renderGallery() {
+  const grid = document.getElementById('galleryGrid');
+  const photos = getData('gallery', DEFAULTS.gallery);
+  grid.innerHTML = '';
+
+  photos.forEach((photo, i) => {
+    const card = document.createElement('div');
+    card.className = 'gallery-card';
+    card.innerHTML = `
+      <button class="del-btn" onclick="event.stopPropagation();deletePhoto(${i})">×</button>
+      <img src="${photo}" alt="照片 ${i+1}" onclick="openLightbox('${photo}')" loading="lazy">
+    `;
+    grid.appendChild(card);
+  });
+
+  const upload = document.createElement('div');
+  upload.className = 'gallery-upload';
+  upload.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>添加照片</span>';
+  upload.onclick = function() { if(editMode) document.getElementById('photoInput').click(); };
+  grid.appendChild(upload);
+}
+
+function addPhotos(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  let count = 0;
+  files.forEach(file => {
+    if (file.size > 5 * 1024 * 1024) { alert(file.name + ' 超过 5MB 限制，已跳过'); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const photos = getData('gallery', []);
+      photos.push(e.target.result);
+      save('gallery', photos);
+      count++;
+      if (count === files.filter(f => f.size <= 5*1024*1024).length) renderGallery();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function deletePhoto(index) {
+  if (!editMode) return;
+  if (!confirm('确定删除这张照片吗？')) return;
+  const photos = getData('gallery', []);
+  photos.splice(index, 1);
+  save('gallery', photos);
+  renderGallery();
+}
+
+function openLightbox(src) {
+  if (editMode) return;
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ==================== VIDEO ====================
+function renderVideos() {
+  const grid = document.getElementById('videoGrid');
+  const videos = getData('videos', DEFAULTS.videos);
+  grid.innerHTML = '';
+
+  videos.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.innerHTML = `
+      <button class="del-btn" onclick="deleteVideo(${i})">×</button>
+      <div class="video-wrapper">
+        <iframe src="${escapeHtml(v.url)}" allowfullscreen loading="lazy"></iframe>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function addVideo() {
+  const input = document.getElementById('videoUrlInput');
+  const url = input.value.trim();
+  if (!url) { alert('请输入视频嵌入链接'); return; }
+  const videos = getData('videos', []);
+  videos.push({ url });
+  save('videos', videos);
+  input.value = '';
+  renderVideos();
+}
+
+function deleteVideo(index) {
+  if (!editMode) return;
+  if (!confirm('确定删除这个视频吗？')) return;
+  const videos = getData('videos', []);
+  videos.splice(index, 1);
+  save('videos', videos);
+  renderVideos();
+}
+
+// ==================== DIARY ====================
+function renderDiary() {
+  const list = document.getElementById('diaryList');
+  const entries = getData('diary', DEFAULTS.diary);
+  // Sort by date descending
+  entries.sort((a,b) => new Date(b.date) - new Date(a.date));
+  list.innerHTML = '';
+
+  if (entries.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:3rem;">还没有随笔，开启编辑模式写下第一条吧 ✍️</div>';
+    return;
+  }
+
+  entries.forEach((entry, i) => {
+    const card = document.createElement('div');
+    card.className = 'diary-card';
+    card.innerHTML = `
+      <button class="del-btn" onclick="deleteDiaryEntry(${i})">×</button>
+      <div class="date">${escapeHtml(entry.date)}</div>
+      <h3 contenteditable="${editMode}" data-key="diary_title_${i}" data-idx="${i}">${escapeHtml(entry.title)}</h3>
+      <div class="content" contenteditable="${editMode}" data-key="diary_content_${i}" data-idx="${i}">${escapeHtml(entry.content)}</div>
+    `;
+    list.appendChild(card);
+  });
+
+  // Re-bind input event for diary inline editing
+  document.querySelectorAll('.diary-card [data-key]').forEach(el => {
+    el.addEventListener('input', function() {
+      if (!editMode) return;
+      const idx = parseInt(this.dataset.idx);
+      const entries = getData('diary', []);
+      if (entries[idx]) {
+        if (this.dataset.key.startsWith('diary_title_')) entries[idx].title = this.textContent;
+        else entries[idx].content = this.textContent;
+        save('diary', entries);
+      }
+    });
+  });
+}
+
+function addDiaryEntry() {
+  const title = document.getElementById('diaryTitle').value.trim();
+  const date = document.getElementById('diaryDate').value;
+  const content = document.getElementById('diaryContent').value.trim();
+  if (!title || !content) { alert('请填写标题和内容'); return; }
+
+  const entries = getData('diary', []);
+  entries.push({ title, date, content });
+  save('diary', entries);
+
+  document.getElementById('diaryTitle').value = '';
+  document.getElementById('diaryContent').value = '';
+  document.getElementById('diaryDate').value = new Date().toISOString().split('T')[0];
+  renderDiary();
+}
+
+function deleteDiaryEntry(index) {
+  if (!editMode) return;
+  if (!confirm('确定删除这篇随笔吗？')) return;
+  const entries = getData('diary', []);
+  entries.splice(index, 1);
+  save('diary', entries);
+  renderDiary();
+}
+
+// ==================== MUSIC ====================
+function initMusic() {
+  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
+  currentMusicIndex = getData('music_index', 0);
+  const audio = document.getElementById('audioPlayer');
+  const select = document.getElementById('musicSelect');
+
+  select.innerHTML = '';
+  playlist.forEach((track, i) => {
+    const opt = document.createElement('div');
+    opt.className = 'track-option' + (i === currentMusicIndex ? ' active' : '');
+    opt.innerHTML = `<span>${escapeHtml(track.name)} <small style="color:var(--text-light)">${escapeHtml(track.artist)}</small></span>`;
+    opt.onclick = function(e) { e.stopPropagation(); playTrack(i); };
+    select.appendChild(opt);
+  });
+
+  // Add local music option
+  const addOpt = document.createElement('div');
+  addOpt.className = 'track-option';
+  addOpt.innerHTML = '<span style="color:var(--accent)">+ 添加本地音乐</span>';
+  addOpt.onclick = function(e) { e.stopPropagation(); document.getElementById('musicFileInput').click(); };
+  select.appendChild(addOpt);
+
+  if (playlist.length > 0 && playlist[currentMusicIndex] && playlist[currentMusicIndex].url) {
+    audio.src = playlist[currentMusicIndex].url;
+    updateMusicInfo(currentMusicIndex);
+  }
+}
+
+function playTrack(index) {
+  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
+  if (index < 0 || index >= playlist.length) return;
+  currentMusicIndex = index;
+  save('music_index', index);
+  const audio = document.getElementById('audioPlayer');
+  audio.src = playlist[index].url;
+  audio.play().catch(() => {});
+  updateMusicInfo(index);
+  document.getElementById('musicPlayBtn').classList.add('playing');
+  document.getElementById('musicPlayBtn').textContent = '⏸';
+  document.getElementById('musicSelect').classList.remove('open');
+  initMusic(); // refresh select
+}
+
+function toggleMusic() {
+  const audio = document.getElementById('audioPlayer');
+  const btn = document.getElementById('musicPlayBtn');
+  if (audio.paused) {
+    audio.play().catch(() => {});
+    btn.classList.add('playing');
+    btn.textContent = '⏸';
+  } else {
+    audio.pause();
+    btn.classList.remove('playing');
+    btn.textContent = '▶';
+  }
+}
+
+function nextTrack() {
+  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
+  if (playlist.length === 0) return;
+  const next = (currentMusicIndex + 1) % playlist.length;
+  playTrack(next);
+}
+
+function toggleMusicList() {
+  document.getElementById('musicSelect').classList.toggle('open');
+}
+
+function updateMusicInfo(index) {
+  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
+  if (playlist[index]) {
+    document.getElementById('trackName').textContent = playlist[index].name;
+    document.getElementById('trackArtist').textContent = playlist[index].artist;
+  }
+}
+
+function addLocalMusic(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const playlist = getData('music_playlist', DEFAULTS.music_playlist);
+  playlist.push({ name: file.name.replace(/\.[^.]+$/, ''), artist: '本地音乐', url, _local: true });
+  save('music_playlist', playlist);
+  initMusic();
+  playTrack(playlist.length - 1);
+  input.value = '';
+}
+
+// Handle audio events
+document.getElementById('audioPlayer').addEventListener('ended', nextTrack);
+document.getElementById('audioPlayer').addEventListener('play', function() {
+  document.getElementById('musicPlayBtn').classList.add('playing');
+  document.getElementById('musicPlayBtn').textContent = '⏸';
+});
+document.getElementById('audioPlayer').addEventListener('pause', function() {
+  document.getElementById('musicPlayBtn').classList.remove('playing');
+  document.getElementById('musicPlayBtn').textContent = '▶';
+});
+
+// Close music list on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#musicPlayer')) {
+    document.getElementById('musicSelect').classList.remove('open');
+  }
+});
+
+// ==================== UTILS ====================
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ==================== SCROLL ANIMATION ====================
+function observeFadeIn() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.section, .hero-content').forEach(el => {
+    el.classList.add('fade-in');
+    observer.observe(el);
+  });
+}
+
+// ==================== BOOTSTRAP ====================
+initAll();
+</script>
+</body>
+</html>
