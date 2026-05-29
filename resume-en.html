@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yang Zhenhao — Resume</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fdfdfc;
+  --text: #1d1d1f;
+  --text-soft: #555;
+  --accent: #1a1a2e;
+  --line: #e5e5e5;
+  --section-gap: 2rem;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f5f5f5;
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 3.5rem 3rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--accent);
+}
+.header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .4rem;
+}
+.header .contact-row {
+  font-size: .9rem;
+  color: var(--text-soft);
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.header .contact-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+}
+
+/* Sections */
+.section {
+  margin-bottom: var(--section-gap);
+}
+.section-title {
+  font-size: .85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: .4rem;
+  margin-bottom: 1rem;
+}
+
+/* Summary */
+.summary p {
+  font-size: .95rem;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+/* Experience & Education */
+.item {
+  margin-bottom: 1.4rem;
+}
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: .25rem;
+}
+.item-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.item-sub {
+  font-weight: 400;
+  color: var(--text-soft);
+  font-size: .9rem;
+}
+.item-date {
+  font-size: .82rem;
+  color: #999;
+  white-space: nowrap;
+}
+.item-desc {
+  font-size: .9rem;
+  color: var(--text-soft);
+  margin-top: .3rem;
+}
+.item-desc ul {
+  list-style: none;
+  padding: 0;
+}
+.item-desc ul li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: .3rem;
+}
+.item-desc ul li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: #bbb;
+}
+
+/* Skills */
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.skill-cat {
+  flex: 1;
+  min-width: 180px;
+}
+.skill-cat h4 {
+  font-size: .85rem;
+  font-weight: 600;
+  margin-bottom: .35rem;
+  color: var(--accent);
+}
+.skill-cat p {
+  font-size: .88rem;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+/* Print */
+@media print {
+  body { background: #fff; }
+  .page { margin: 0; box-shadow: none; padding: 2rem 1.5rem; max-width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .page { padding: 2rem 1.2rem; margin: 0; }
+  .header h1 { font-size: 1.5rem; }
+  .header .contact-row { gap: .8rem; font-size: .8rem; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Yang Zhenhao</h1>
+    <div class="contact-row">
+      <span>📧 1431811285@qq.com</span>
+      <span>📍 Wuhan, Hubei, China</span>
+      <span>🎂 20 years old</span>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="section">
+    <div class="section-title">Professional Summary</div>
+    <div class="summary">
+      <p>
+        A dedicated university student and experienced broadcaster with a native command of Mandarin Chinese
+        and exceptional proficiency in multiple regional Chinese dialects. Passionate about language, communication,
+        and the intersection of human expression with artificial intelligence. Seeking to contribute linguistic
+        expertise and cultural insight to help advance Grok's Chinese-language capabilities.
+      </p>
+    </div>
+  </div>
+
+  <!-- Education -->
+  <div class="section">
+    <div class="section-title">Education</div>
+    <div class="item">
+      <div class="item-header">
+        <span class="item-title">Hubei University of Economics</span>
+        <span class="item-date">2023 — Present</span>
+      </div>
+      <div class="item-sub">Undergraduate Student &bull; Wuhan, Hubei, China</div>
+      <div class="item-desc">
+        Currently pursuing a bachelor's degree. Active member of the university community
+        with two years of broadcasting experience at the campus radio station.
+      </div>
+    </div>
+  </div>
+
+  <!-- Experience -->
+  <div class="section">
+    <div class="section-title">Experience</div>
+
+    <div class="item">
+      <div class="item-header">
+        <span class="item-title">Broadcaster &amp; Host</span>
+        <span class="item-date">2024 — Present</span>
+      </div>
+      <div class="item-sub">Campus Radio Station, Hubei University of Economics &bull; Wuhan</div>
+      <div class="item-desc">
+        <ul>
+          <li>Delivered daily broadcasts in standard Mandarin, reaching the entire university campus</li>
+          <li>Hosted live programs, interviews, and campus events with professionalism and clarity</li>
+          <li>Developed scripts and content for diverse programming, honing written and spoken communication skills</li>
+          <li>Collaborated with a team of fellow broadcasters to maintain a consistent broadcast schedule</li>
+          <li>Served for two consecutive years, demonstrating reliability and commitment</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Language Skills -->
+  <div class="section">
+    <div class="section-title">Language &amp; Dialect Proficiency</div>
+
+    <div class="item-desc">
+      <ul>
+        <li>
+          <strong>Mandarin Chinese (Putonghua)</strong> — Native speaker with standard, broadcast-quality pronunciation;
+          two years of professional broadcasting experience
+        </li>
+        <li>
+          <strong>Cantonese (Yue)</strong> — Full comprehension and fluent translation to/from Mandarin;
+          able to accurately transcribe, interpret, and evaluate Cantonese speech
+        </li>
+        <li>
+          <strong>Sichuan Dialect (Sichuanese)</strong> — Native-level understanding and translation;
+          familiar with regional vocabulary, idioms, and tonal variations unique to Southwest Mandarin
+        </li>
+        <li>
+          <strong>Hubei Dialect</strong> — Complete fluency in the local dialect of Hubei Province;
+          capable of nuanced translation capturing regional expressions and speech patterns
+        </li>
+        <li>
+          <strong>Northeastern Mandarin (Dongbei Dialect)</strong> — Strong comprehension and accurate
+          translation skills for one of China's most distinctive regional dialects
+        </li>
+        <li>
+          <strong>English</strong> — Proficient in reading, writing, and conversation
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Why Grok -->
+  <div class="section">
+    <div class="section-title">Why I Want to Work on Grok</div>
+    <div class="summary">
+      <p>
+        I understand that your team is seeking talent to help train and refine AI models for the Chinese language.
+        Language is not merely vocabulary and grammar — it is culture, tone, dialect, and the unspoken nuances
+        that vary across every region of China. With my broadcasting background, I bring a trained ear for
+        pronunciation and clarity. With my dialect expertise spanning Cantonese, Sichuanese, Hubei, and
+        Dongbei varieties, I bring the ability to help Grok understand not just "Chinese," but
+        <em>how Chinese people actually speak</em> — from the teahouses of Chengdu to the streets of Shenyang.
+      </p>
+      <p style="margin-top:.8rem;">
+        I am eager to apply my linguistic skills, cultural knowledge, and attention to detail toward making
+        Grok a truly capable and natural conversational partner for Chinese users — whether in casual chat,
+        professional correspondence, or creative writing. I am confident that my unique combination of
+        broadcasting professionalism and cross-dialect fluency makes me a strong fit for this role.
+      </p>
+    </div>
+  </div>
+
+  <!-- Additional -->
+  <div class="section">
+    <div class="section-title">Personal Qualities</div>
+    <div class="skills-grid">
+      <div class="skill-cat">
+        <h4>Communication</h4>
+        <p>Two years of live broadcasting; articulate, clear, and engaging in both scripted and impromptu speech</p>
+      </div>
+      <div class="skill-cat">
+        <h4>Linguistic Precision</h4>
+        <p>Trained to distinguish subtle pronunciation differences; meticulous about tonal accuracy and regional authenticity</p>
+      </div>
+      <div class="skill-cat">
+        <h4>Cultural Awareness</h4>
+        <p>Deep understanding of regional Chinese cultures, idioms, humor, and social context across multiple dialect groups</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
